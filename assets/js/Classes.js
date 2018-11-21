@@ -1,7 +1,3 @@
-let playerStats = {
-	height: 5,
-	speed: 7.0,
-}
 
 class Entity {
 	constructor( data ){
@@ -69,7 +65,6 @@ class Player extends Entity {
 		scene0.add( this.body.BBoxHelper );
 		
 		this.body.rotation.order = 'YXZ';
-		console.log( this.body );
 		
 		
 		this.initControls();
