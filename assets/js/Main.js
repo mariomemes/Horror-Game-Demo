@@ -1,11 +1,11 @@
-var canvas = document.getElementById("myCanvas");
+let canvas = document.getElementById("myCanvas");
 let camera0, scene0, scene1, renderer, stats, controls;
 let loadingManager, textureLoader, gltfLoader;
 let box, barrel, sphere;
 let Textures = {
 	grass: null,
 };
-let Lights = [];
+// let Lights = [];
 let clock = new THREE.Clock() , delta;
 let shadows = true;
 
@@ -45,7 +45,7 @@ let Levels = [
 ];
 
 
-function init() {
+let init = function() {
 	renderer = new THREE.WebGLRenderer( { canvas: canvas, antialias: true } );
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	if(shadows){
@@ -55,6 +55,7 @@ function init() {
 
 	scene0 = new THREE.Scene();
 	scene0.background = new THREE.Color( 0x101020 );
+	scene1 = new THREE.Scene();
 
 	camera0 = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 10000 );
 
@@ -79,7 +80,7 @@ function init() {
 	loadingManager.onLoad = function ( ) {
 		setTimeout( function(){ 
 			loadingFinished();
-			initLevel0();
+			Levels[0].init();
 			console.log( "finished loading" );
 		}, 0 );
 	};
@@ -114,20 +115,50 @@ let LoadingScreen = function() {
 	renderer.render( ls.scene, ls.camera );
 }
 
-let initLevel0 = function(){
+Levels[0].init = function(){
+	Levels[0].Lights = [];
+	Levels[0].scene = scene0;
 	
-	// createStartingMesh();
-	initLevel0Models();
-	initLights();
+	Levels[0].initModels();
+	Levels[0].initLights();
+	initPlayer({
+		position: Levels[0].playerPos,
+		camera: camera0,
+	});
+	Levels[1].init();
 	
 }
 
-var loadModels = function(){
+Levels[1].init = function(){
+	Levels[1].Lights = [];
+	Levels[1].scene = scene1;
+	
+	Levels[1].initModels();
+	Levels[1].initLights();
+	/* initPlayer({
+		position: Levels[1].playerPos,
+		camera: camera0,
+	}); */
+}
 
-	gltfLoader.load( '/assets/models/Level_1/room1.gltf',
+let loadModels = function(){
+
+	gltfLoader.load( '/assets/models/Level_0/room1.gltf',
 		function ( gltf ) {
 			
 			Levels[0].gltf = gltf;
+
+		}, function ( xhr ) {
+			// console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+		}, function ( error ) {
+			console.log( 'Error happened: ' + error);
+		}
+	);
+	
+	gltfLoader.load( '/assets/models/Level_1/corridor.gltf',
+		function ( gltf ) {
+			
+			Levels[1].gltf = gltf;
 
 		}, function ( xhr ) {
 			// console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
@@ -145,7 +176,13 @@ let initTextures = function(){
 	Textures.grass.repeat.set( 20, 20 );
 }
 
-function animate( time ) {
+let clearScene = function( scene ){
+	while( scene.children.length > 0 ){
+		scene.remove( scene.children[0] );
+	}
+}
+
+let animate = function( time ) {
 	
 	if( loadingReady == false ){
 		LoadingScreen();

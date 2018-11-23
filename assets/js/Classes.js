@@ -1,4 +1,21 @@
 
+let initPlayer = function( data ){
+	// if player doesnt exist then create, else just change the position
+	if( player.body == undefined ){
+		
+		player = new Player({
+			pos: new THREE.Vector3().copy( data.position ),
+			camera: data.camera,
+		});
+		
+	} else {
+		
+		player.body.position.copy( data.position );
+		
+	}
+
+}
+
 class Entity {
 	constructor( data ){
 		this.body = new THREE.Group();

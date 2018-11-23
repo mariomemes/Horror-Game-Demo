@@ -1,5 +1,5 @@
 
-let createStartingMesh = function(){
+Levels[0].createStartingMesh = function(){
 	let floor = new THREE.Mesh(
 		new THREE.PlaneGeometry( 200, 200 ),
 		new THREE.MeshPhongMaterial({
@@ -9,10 +9,10 @@ let createStartingMesh = function(){
 		})
 	);
 	floor.rotation.x = -90 * Math.PI/180;
-	scene0.add( floor )
+	Levels[0].scene.add( floor )
 }
 
-let initLevel0Models = function(){
+Levels[0].initModels = function(){
 	
 	// Levels[0].gltf.scene.position.y += 0.01; // avoid Z fighting
 
@@ -31,18 +31,18 @@ let initLevel0Models = function(){
 				light.shadow.bias = 0.0001;
 			}
 			
-			Lights.push( light );
+			Levels[0].Lights.push( light );
 
 			let help = new THREE.PointLightHelper( light, 0.2 );
-			// scene0.add( help );
+			// Levels[0].scene.add( help );
 		}
 
 		if( node.name.includes( "Box" ) ){
 			// "http://localhost:8080/models/room1/wood.png"
 			// Bad texture naming led to a bug
 			let baseUri = node.material.map.image.baseURI;
-			node.material.map.image.currentSrc = baseUri + 'assets/models/Level_1/box_wood.jpg';
-			node.material.map.image.src = baseUri + 'assets/models/Level_1/box_wood.jpg';
+			node.material.map.image.currentSrc = baseUri + 'assets/models/Level_0/box_wood.jpg';
+			node.material.map.image.src = baseUri + 'assets/models/Level_0/box_wood.jpg';
 		}
 
 		if( node.name.includes( "Box" ) ||
@@ -74,25 +74,26 @@ let initLevel0Models = function(){
 
 	Levels[0].gltf.scene.getObjectByName('Player').visible = false;
 	Levels[0].playerPos = new THREE.Vector3().copy( Levels[0].gltf.scene.getObjectByName('Player').position );
+	Levels[0].playerPos.y = playerStats.height;
 
 	// initPlayer();
-	player = new Player({
+	/* player = new Player({
 		pos: new THREE.Vector3( 
 			Levels[0].playerPos.x, 
 			playerStats.height, 
 			Levels[0].playerPos.z 
 		),
 		camera: camera0,
-	});
+	}); */
 	
-	constructCollisionBoxes();
+	Levels[0].constructCollisionBoxes();
 
 	console.log( Levels[0].gltf );
-	scene0.add( Levels[0].gltf.scene );
+	Levels[0].scene.add( Levels[0].gltf.scene );
 	
 }
 
-let constructCollisionBoxes = function() {
+Levels[0].constructCollisionBoxes = function() {
 
 	staticCollideMesh.forEach( function( mesh ){
 		// Bounding Box
@@ -107,16 +108,16 @@ let constructCollisionBoxes = function() {
 
 		// helper
 		mesh.BBoxHelper = new THREE.Box3Helper( mesh.BBox , 0xff0000 );
-		scene0.add( mesh.BBoxHelper );
+		Levels[0].scene.add( mesh.BBoxHelper );
 	});
 }
 
-let initLights = function(){
+Levels[0].initLights = function(){
 	let ambientLight = new THREE.AmbientLight( 0xffffff , 0.02 );
-	Lights.push( ambientLight );
+	Levels[0].Lights.push( ambientLight );
 	
-	Lights.forEach( function( light ){
-		scene0.add( light );
+	Levels[0].Lights.forEach( function( light ){
+		Levels[0].scene.add( light );
 	});
 }
 
