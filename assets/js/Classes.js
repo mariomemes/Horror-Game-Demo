@@ -78,8 +78,8 @@ class Player extends Entity {
 		this.body.BBoxHelper = new THREE.BoxHelper( this.body, 0x00ff00 );
 		this.body.BBox = new THREE.Box3().setFromObject( this.body );
 		
-		scene0.add( this.body );
-		scene0.add( this.body.BBoxHelper );
+		Levels[currentLevel].scene.add( this.body );
+		Levels[currentLevel].scene.add( this.body.BBoxHelper );
 		
 		this.body.rotation.order = 'YXZ';
 		
@@ -100,7 +100,7 @@ class Player extends Entity {
 		let self = this;
 		let boxIntersection = false;
 		
-		staticCollideMesh.some( function( staticMesh ){
+		Levels[currentLevel].staticCollideMesh.some( function( staticMesh ){
 			if( self.body.BBox.intersectsBox( staticMesh.BBox ) ){
 				boxIntersection = true;
 				return true;
@@ -216,9 +216,18 @@ class Player extends Entity {
 		let intersects = {};
 		
 		this.rays.down.set( this.body.position , new THREE.Vector3( 0 , -1 , 0) );
-		intersects.down = this.rays.down.intersectObject( 
-			scene0.getObjectByName('Room')
-		);
+		
+		if( currentLevel === 0 ){
+			intersects.down = this.rays.down.intersectObject(
+				Levels[0].scene.getObjectByName('Room')
+			);
+		} else if( currentLevel === 1 ){
+			intersects.down = this.rays.down.intersectObjects([
+				Levels[1].scene.getObjectByName('Floor'),
+				Levels[1].scene.getObjectByName('Stairs_body'),
+			]);
+		}
+		
 		
 		if( intersects.down.length > 0 ){
 			// console.log( intersects.down[0].distance );

@@ -1,16 +1,12 @@
 let canvas = document.getElementById("myCanvas");
 let camera0, scene0, scene1, renderer, stats, controls;
 let loadingManager, textureLoader, gltfLoader;
-let box, barrel, sphere;
+let currentLevel;
 let Textures = {
 	grass: null,
 };
-// let Lights = [];
 let clock = new THREE.Clock() , delta;
 let shadows = true;
-
-let staticCollideMesh = [];
-let dynamicCollideMesh = [];
 
 // LOADING SCREEN
 let loadingReady = false;
@@ -37,9 +33,17 @@ let player = {
 // LEVELS
 let Levels = [
 	{
+		Lights: [],
+		scene: null,
+		staticCollideMesh: [],
+		dynamicCollideMesh: [],
 		
 	},
 	{
+		Lights: [],
+		scene: null,
+		staticCollideMesh: [],
+		dynamicCollideMesh: [],
 		
 	}
 ];
@@ -75,7 +79,7 @@ let init = function() {
 	
 	loadingManager = new THREE.LoadingManager();
 	loadingManager.onStart = function ( url, itemsLoaded, itemsTotal ) {
-		console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
+		// console.log( 'Started loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
 	};
 	loadingManager.onLoad = function ( ) {
 		setTimeout( function(){ 
@@ -116,8 +120,8 @@ let LoadingScreen = function() {
 }
 
 Levels[0].init = function(){
-	Levels[0].Lights = [];
 	Levels[0].scene = scene0;
+	currentLevel = 0;
 	
 	Levels[0].initModels();
 	Levels[0].initLights();
@@ -130,15 +134,15 @@ Levels[0].init = function(){
 }
 
 Levels[1].init = function(){
-	Levels[1].Lights = [];
 	Levels[1].scene = scene1;
+	currentLevel = 1;
 	
 	Levels[1].initModels();
 	Levels[1].initLights();
-	/* initPlayer({
+	initPlayer({
 		position: Levels[1].playerPos,
 		camera: camera0,
-	}); */
+	});
 }
 
 let loadModels = function(){
@@ -182,6 +186,17 @@ let clearScene = function( scene ){
 	}
 }
 
+let renderProperScene = function(){
+	switch( currentLevel ){
+		case 0:
+			renderer.render( Levels[0], camera0 );
+			break;
+		case 1:
+			
+			break;
+	} 
+}
+
 let animate = function( time ) {
 	
 	if( loadingReady == false ){
@@ -194,7 +209,7 @@ let animate = function( time ) {
 	delta = clock.getDelta();
 	player.update( delta );
 
-	renderer.render( scene0, camera0 );
+	renderer.render( Levels[currentLevel].scene , camera0 );
 	requestAnimationFrame( animate );
 
 	stats.end();

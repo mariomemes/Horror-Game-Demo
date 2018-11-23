@@ -50,7 +50,7 @@ Levels[0].initModels = function(){
 			node.name.includes( "Wall" ) ||
 			node.name.includes( "Table" ) ){
 
-			staticCollideMesh.push( node );
+			Levels[0].staticCollideMesh.push( node );
 
 		}
 
@@ -95,7 +95,7 @@ Levels[0].initModels = function(){
 
 Levels[0].constructCollisionBoxes = function() {
 
-	staticCollideMesh.forEach( function( mesh ){
+	Levels[0].staticCollideMesh.forEach( function( mesh ){
 		// Bounding Box
 		mesh.BBox = new THREE.Box3().setFromObject( mesh );
 
