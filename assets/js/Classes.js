@@ -1,16 +1,19 @@
 
 let initPlayer = function( data ){
-	// if player doesnt exist then create, else just change the position
+	// if player doesnt exist then create, else just change the params
 	if( player.body == undefined ){
 		
 		player = new Player({
 			pos: new THREE.Vector3().copy( data.position ),
 			camera: data.camera,
+			rotation: data.rotation,
 		});
 		
 	} else {
 		
+		Levels[ currentLevel ].scene.add( player.body, player.body.BBoxHelper )
 		player.body.position.copy( data.position );
+		player.body.rotation.copy( data.rotation );
 		
 	}
 
@@ -55,7 +58,7 @@ class Player extends Entity {
 		};
 		this.speedWalking = playerStats.speed;
 		this.sideWalkingSpeed = playerStats.speed * 0.6;
-		this.runningSpeed = playerStats.speed * 1.5;
+		this.runningSpeed = playerStats.speed * 1.7;
 		this.turningSpeed = 100.0;
 		this.pHeight = playerStats.height;
 		this.quater = new THREE.Quaternion();
@@ -73,6 +76,8 @@ class Player extends Entity {
 		
 		
 		this.body.position.copy( data.pos );
+		this.body.rotation.copy( data.rotation );
+		// this.body.rotation.y = data.rotation.y;
 		
 		// Bounding Box
 		this.body.BBoxHelper = new THREE.BoxHelper( this.body, 0x00ff00 );
@@ -214,23 +219,28 @@ class Player extends Entity {
 	
 	updateGravity(){
 		let intersects = {};
+		let num;
 		
 		this.rays.down.set( this.body.position , new THREE.Vector3( 0 , -1 , 0) );
 		
 		if( currentLevel === 0 ){
+			
 			intersects.down = this.rays.down.intersectObject(
 				Levels[0].scene.getObjectByName('Room')
 			);
+			num = 0;
+			
 		} else if( currentLevel === 1 ){
+			
 			intersects.down = this.rays.down.intersectObjects([
 				Levels[1].scene.getObjectByName('Floor'),
 				Levels[1].scene.getObjectByName('Stairs_body'),
 			]);
+			num = 1;
 		}
 		
 		
-		if( intersects.down.length > 0 ){
-			// console.log( intersects.down[0].distance );
+		if( intersects.down.length > num ){
 			this.body.position.y = intersects.down[0].point.y + this.pHeight;
 		}
 	}

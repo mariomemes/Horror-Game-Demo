@@ -84,7 +84,7 @@ let init = function() {
 	loadingManager.onLoad = function ( ) {
 		setTimeout( function(){ 
 			loadingFinished();
-			Levels[0].init();
+			Levels[1].init();
 			console.log( "finished loading" );
 		}, 0 );
 	};
@@ -128,8 +128,9 @@ Levels[0].init = function(){
 	initPlayer({
 		position: Levels[0].playerPos,
 		camera: camera0,
+		rotation: Levels[0].playerRot,
 	});
-	Levels[1].init();
+	// Levels[1].init();
 	
 }
 
@@ -142,6 +143,7 @@ Levels[1].init = function(){
 	initPlayer({
 		position: Levels[1].playerPos,
 		camera: camera0,
+		rotation: Levels[1].playerRot,
 	});
 }
 

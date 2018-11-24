@@ -3,7 +3,20 @@
 Levels[1].initModels = function(){
 
 	Levels[1].gltf.scene.traverse( function( node ) {
+		/* 
+			List:
+			-shadows too expensive
+			-change empty objects into lamps
+		*/
 		
+		if( shadows ){
+			// node.castShadow = true;
+			// node.receiveShadow = true;
+		}
+		
+		if( node.name.includes( "Pole_" ) ){
+			node.material.color = new THREE.Color( 0.43 , 0.27 , 0.14 );
+		}
 		
 		if( node.name === "Stairs_body" || node.name === "Player" ){
 			node.material.visible = false;
@@ -17,7 +30,40 @@ Levels[1].initModels = function(){
 		
 	});
 	
-	Levels[1].playerPos = new THREE.Vector3( 72 , 15.5 , 0 );
+	// Temporaary Lighting
+	let poses = [
+		new THREE.Vector3( 70 , 23 , 0 ),
+		new THREE.Vector3( -65 , 23 , 0 ),
+		new THREE.Vector3( -65 , 23 , -150 ),
+		new THREE.Vector3( -215 , 23 , -150 ),
+		new THREE.Vector3( -215 , 23 , 0 ),
+		new THREE.Vector3( -365 , 23 , 0 )
+	];
+	poses.forEach(function(lig){
+		let light = new THREE.PointLight( 0xffffee, 1.5, 50 , 2 );
+		light.position.copy( lig );
+		light.position.y -= 1;
+		if(shadows){
+			light.castShadow = true;
+			light.shadow.mapSize.width = 512*1;
+			light.shadow.mapSize.height = 512*1;
+			light.shadow.camera.near = 0.1;
+			light.shadow.camera.far = 1000;
+			light.shadow.bias = 0.0001;
+		}
+		
+		Levels[1].Lights.push( light );
+
+		let help = new THREE.PointLightHelper( light, 0.5 );
+		Levels[1].scene.add( help );
+	});
+	
+	
+	
+	Levels[1].playerPos = new THREE.Vector3().copy( Levels[1].gltf.scene.getObjectByName('Player').position );
+	// Levels[1].playerPos = new THREE.Vector3( 55 , 20 , 0 );
+	// Levels[1].playerRot = new THREE.Euler().copy( Levels[1].gltf.scene.getObjectByName('Player').rotation );
+	Levels[1].playerRot = new THREE.Euler( 0 , 90*Math.PI/180 , 0 );
 	
 	console.log( "corridor: " );
 	console.log( Levels[1].gltf );
@@ -36,8 +82,8 @@ Levels[1].constructCollisionBoxes = function() {
 }
 
 Levels[1].initLights = function(){
-	// let ambientLight = new THREE.AmbientLight( 0xffffff , 0.02 );
-	let ambientLight = new THREE.AmbientLight( 0xffffff , 1.0 );
+	let ambientLight = new THREE.AmbientLight( 0xffffff , 0.02 );
+	// let ambientLight = new THREE.AmbientLight( 0xffffff , 1.0 );
 	Levels[1].Lights.push( ambientLight );
 	
 	Levels[1].Lights.forEach( function( light ){

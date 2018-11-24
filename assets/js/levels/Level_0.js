@@ -75,6 +75,7 @@ Levels[0].initModels = function(){
 	Levels[0].gltf.scene.getObjectByName('Player').visible = false;
 	Levels[0].playerPos = new THREE.Vector3().copy( Levels[0].gltf.scene.getObjectByName('Player').position );
 	Levels[0].playerPos.y = playerStats.height;
+	Levels[0].playerRot = new THREE.Euler().copy( Levels[0].gltf.scene.getObjectByName('Player').rotation );
 
 	// initPlayer();
 	/* player = new Player({
