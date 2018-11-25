@@ -261,6 +261,10 @@ class Player extends Entity {
 		}
 	}
 	
+	switchLight(){
+		
+	}
+	
 	initControls(){
 		let self = this;
 		window.addEventListener( 'keydown', function(evt){
