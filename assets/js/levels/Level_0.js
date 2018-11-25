@@ -21,7 +21,7 @@ Levels[0].initModels = function(){
 		if( node.name.includes( "Lamp" ) ) {
 			let light = new THREE.PointLight( 0xffffee, 1.5, 15 , 2 );
 			light.position.copy( node.position );
-			light.position.y -= 1;
+			light.position.y += 1;
 			if(shadows){
 				light.castShadow = true;
 				light.shadow.mapSize.width = 512*1;
@@ -31,9 +31,9 @@ Levels[0].initModels = function(){
 				light.shadow.bias = 0.0001;
 			}
 			
-			Levels[0].Lights.push( light );
+			//Levels[0].Lights.push( light );
 
-			let help = new THREE.PointLightHelper( light, 0.2 );
+			// let help = new THREE.PointLightHelper( light, 0.2 );
 			// Levels[0].scene.add( help );
 		}
 
@@ -41,8 +41,8 @@ Levels[0].initModels = function(){
 			// "http://localhost:8080/models/room1/wood.png"
 			// Bad texture naming led to a bug
 			let baseUri = node.material.map.image.baseURI;
-			node.material.map.image.currentSrc = baseUri + 'assets/models/Level_0/box_wood.jpg';
-			node.material.map.image.src = baseUri + 'assets/models/Level_0/box_wood.jpg';
+			node.material.map.image.currentSrc = baseUri + 'assets/models/Level_0_alt/box_wood.jpg';
+			node.material.map.image.src = baseUri + 'assets/models/Level_0_alt/box_wood.jpg';
 		}
 
 		if( node.name.includes( "Box" ) ||
@@ -108,8 +108,10 @@ Levels[0].constructCollisionBoxes = function() {
 		}
 
 		// helper
-		mesh.BBoxHelper = new THREE.Box3Helper( mesh.BBox , 0xff0000 );
-		Levels[0].scene.add( mesh.BBoxHelper );
+		if( box3helpers ){
+			mesh.BBoxHelper = new THREE.Box3Helper( mesh.BBox , 0xff0000 );
+			Levels[0].scene.add( mesh.BBoxHelper );
+		}
 	});
 }
 
@@ -119,6 +121,10 @@ Levels[0].initLights = function(){
 	
 	Levels[0].Lights.forEach( function( light ){
 		Levels[0].scene.add( light );
+		if( Levels[0].lightHelpers && light instanceof THREE.PointLight ) {
+			let lightHelp = new THREE.PointLightHelper( light, 0.2 );
+			Levels[0].scene.add( lightHelp );
+		}
 	});
 }
 

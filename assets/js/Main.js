@@ -6,7 +6,8 @@ let Textures = {
 	grass: null,
 };
 let clock = new THREE.Clock() , delta;
-let shadows = true;
+let shadows = false;
+let box3helpers = false;
 
 // LOADING SCREEN
 let loadingReady = false;
@@ -36,15 +37,13 @@ let Levels = [
 		Lights: [],
 		scene: null,
 		staticCollideMesh: [],
-		dynamicCollideMesh: [],
-		
+		lightHelpers: true,
 	},
 	{
 		Lights: [],
 		scene: null,
 		staticCollideMesh: [],
-		dynamicCollideMesh: [],
-		
+		lightHelpers: false,
 	}
 ];
 
@@ -84,7 +83,7 @@ let init = function() {
 	loadingManager.onLoad = function ( ) {
 		setTimeout( function(){ 
 			loadingFinished();
-			Levels[1].init();
+			Levels[0].init();
 			console.log( "finished loading" );
 		}, 0 );
 	};
@@ -149,7 +148,7 @@ Levels[1].init = function(){
 
 let loadModels = function(){
 
-	gltfLoader.load( '/assets/models/Level_0/room1.gltf',
+	gltfLoader.load( '/assets/models/Level_0_alt/room1_ver2.gltf',
 		function ( gltf ) {
 			
 			Levels[0].gltf = gltf;

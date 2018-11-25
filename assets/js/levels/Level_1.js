@@ -10,8 +10,8 @@ Levels[1].initModels = function(){
 		*/
 		
 		if( shadows ){
-			// node.castShadow = true;
-			// node.receiveShadow = true;
+			node.castShadow = true;
+			node.receiveShadow = true;
 		}
 		
 		if( node.name.includes( "Pole_" ) ){

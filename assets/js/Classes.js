@@ -11,7 +11,7 @@ let initPlayer = function( data ){
 		
 	} else {
 		
-		Levels[ currentLevel ].scene.add( player.body, player.body.BBoxHelper )
+		// if( box3helpers ) Levels[ currentLevel ].scene.add( player.body, player.body.BBoxHelper )
 		player.body.position.copy( data.position );
 		player.body.rotation.copy( data.rotation );
 		
@@ -23,10 +23,11 @@ class Entity {
 	constructor( data ){
 		this.body = new THREE.Group();
 		this.cylinder = new THREE.Mesh( 
-			new THREE.CylinderBufferGeometry( 0.7 , 0.7 , playerStats.height, 64 ),
+			new THREE.CylinderBufferGeometry( 0.9 , 0.9 , playerStats.height, 64 ),
 			new THREE.MeshLambertMaterial({ 
 				color: 0xff0000,
 				flatShading: true,
+				visible: false,
 			})
 		);
 		
@@ -59,46 +60,64 @@ class Player extends Entity {
 		this.speedWalking = playerStats.speed;
 		this.sideWalkingSpeed = playerStats.speed * 0.6;
 		this.runningSpeed = playerStats.speed * 1.7;
-		this.turningSpeed = 100.0;
+		this.turningSpeed = 300.0;
 		this.pHeight = playerStats.height;
-		this.quater = new THREE.Quaternion();
 		this.body.tmpPosition = new THREE.Vector3().copy( data.pos );
 		this.tmpVec3 = new THREE.Vector3();
 		
-		// this.camera = data.camera;
+		this.neck = new THREE.Object3D();
+		this.neck.position.y = -2;
+		this.camera = data.camera;
+		this.camera.position.y += 2;
+		this.neck.add( data.camera );
+		this.body.add( this.neck );
 		
-		this.body.add( data.camera );
-		this.camera = this.body.children[0];
 		this.body.add( this.cylinder );
+		this.cylinder.position.y -= this.pHeight/2;
 		
-		this.cylinder.position.y -= playerStats.height/2;
-		// data.camera.position.set( 0 , this.pHeight , 0 );
+		// Lantern
+		this.lanternON = true;
+		this.lanternLight = new THREE.PointLight( 0x0000dd , 0.9 , 20 , 2 );
+		this.lantern = new THREE.Mesh(
+			new THREE.CylinderBufferGeometry( 0.1 , 0.1 , 0.5 , 10 ),
+			new THREE.MeshBasicMaterial({ color: 0x000099 })
+		);
+		this.lantern.add( this.lanternLight );
+		this.body.add( this.lantern );
+		this.lantern.position.set( 0.3 , -0.5 , -0.5 );
 		
 		
 		this.body.position.copy( data.pos );
 		this.body.rotation.copy( data.rotation );
 		// this.body.rotation.y = data.rotation.y;
 		
-		// Bounding Box
-		this.body.BBoxHelper = new THREE.BoxHelper( this.body, 0x00ff00 );
-		this.body.BBox = new THREE.Box3().setFromObject( this.body );
 		
+		// Bounding Box
+		this.body.BBox = new THREE.Box3().setFromObject( this.body );
 		Levels[currentLevel].scene.add( this.body );
-		Levels[currentLevel].scene.add( this.body.BBoxHelper );
+		if( box3helpers ){
+			this.body.BBoxHelper = new THREE.BoxHelper( this.body, 0x00ff00 );
+			Levels[currentLevel].scene.add( this.body.BBoxHelper );
+		}
 		
 		this.body.rotation.order = 'YXZ';
 		
 		
 		this.initControls();
-		// controls = new THREE.FirstPersonControls( this.body , canvas );
 	}
 	
 	update( time ){
 		this.updateMovement( time );
-		// this.body.BBox.setFromObject( this.body );
-		// this.testCollision();
+		// Setting Bounding Boxes and collision testing happens in move
 		this.updateGravity();
-		this.body.BBoxHelper.update();
+		if( box3helpers ) this.body.BBoxHelper.update();
+		
+		if( this.lanternON ){
+			this.lantern.visible = true;
+			
+		} else {
+			this.lantern.visible = false;
+		}
 	}
 	
 	testCollision( axis ){
@@ -118,9 +137,6 @@ class Player extends Entity {
 					case 'x':
 						this.body.position.x = this.body.tmpPosition.x;
 						break;
-					case 'y':
-						this.body.position.y = this.body.tmpPosition.y;
-						break;
 					case 'z':
 						this.body.position.z = this.body.tmpPosition.z;
 						break;
@@ -128,7 +144,6 @@ class Player extends Entity {
 			} else {
 				this.body.position.copy( this.body.tmpPosition );
 			}
-			// console.log( 'aaaaa im in a box' );
 		}
 	}
 	
@@ -136,11 +151,32 @@ class Player extends Entity {
 		this.body.tmpPosition.copy( this.body.position );
 		
 		// TURNING
-		if( this.controls.turning.right == true ){
-			this.body.rotation.y -= this.turningSpeed * Math.PI/180 * time;
+		if( this.controls.turning.right == true ){ // E
+			// this.body.rotation.y -= this.turningSpeed/3 * Math.PI/180 * time;
+			
+			this.tmpVec3.copy( this.neck.rotation );
+			this.tmpVec3.z -= 5 / this.turningSpeed;
+			if( this.tmpVec3.z > -0.4 ) { // right boundry 
+				this.neck.rotation.z -= 5 / this.turningSpeed;
+			}
+		} else {
+			if( this.neck.rotation.z < -0.01 ){
+				this.neck.rotation.z += 15 / this.turningSpeed;
+			}
 		}
-		if( this.controls.turning.left == true ){
-			this.body.rotation.y += this.turningSpeed * Math.PI/180 * time;
+		
+		if( this.controls.turning.left == true ){ // Q
+			// this.body.rotation.y += this.turningSpeed/3 * Math.PI/180 * time;
+			
+			this.tmpVec3.copy( this.neck.rotation );
+			this.tmpVec3.z += 5 / this.turningSpeed;
+			if( this.tmpVec3.z < 0.4 ) { // left boundry 
+				this.neck.rotation.z += 5 / this.turningSpeed;
+			}
+		} else {
+			if( this.neck.rotation.z > 0.01 ){
+				this.neck.rotation.z -= 15 / this.turningSpeed;
+			}
 		}
 		
 		// MOVEMENT
@@ -196,25 +232,6 @@ class Player extends Entity {
 			
 		}
 		
-		
-		/* // MOVEMENT
-		// Forward
-		if( this.controls.up == true ){ 
-			this.body.translateZ( -this.speedWalking * time );
-		}
-		// Back
-		if( this.controls.down == true ){ 
-			this.body.translateZ( this.speedWalking * time );
-		}
-		// Left
-		if( this.controls.left == true ){ 
-			this.body.translateX( -this.speedWalking * time * 0.7 );
-		}
-		// Right
-		if( this.controls.right == true ){ 
-			this.body.translateX( this.speedWalking * time * 0.7 );
-		} */
-		
 	}
 	
 	updateGravity(){
@@ -226,7 +243,7 @@ class Player extends Entity {
 		if( currentLevel === 0 ){
 			
 			intersects.down = this.rays.down.intersectObject(
-				Levels[0].scene.getObjectByName('Room')
+				Levels[0].scene.getObjectByName('Floor')
 			);
 			num = 0;
 			
@@ -239,7 +256,6 @@ class Player extends Entity {
 			num = 1;
 		}
 		
-		
 		if( intersects.down.length > num ){
 			this.body.position.y = intersects.down[0].point.y + this.pHeight;
 		}
@@ -250,12 +266,12 @@ class Player extends Entity {
 		window.addEventListener( 'keydown', function(evt){
 			
 			self.keyset( evt , true );
-			
 			// console.log( evt );
-			/* if( evt.key !== 'F5' && evt.key !== 'Ctrl' ){
-				evt.preventDefault();
-				console.log( "haha");
-			} */
+			
+			if( evt.keyCode === 70 ){ // F
+				self.lanternON = !self.lanternON;
+			}
+			
 			if( evt.key === 'p' ){
 				if( pointerIsLocked( canvas ) === false ) {
 					startPointerLock();
@@ -276,13 +292,13 @@ class Player extends Entity {
 			
 			// MAKE SURE TO SET BODY ROTATION ORDER  TO 'YXZ' !!!!
 			// restrict the camera x rotation
-			self.tmpVec3.copy( self.body.children[0].rotation );
-			self.tmpVec3.x -= movementY/300;
+			self.tmpVec3.copy( self.camera.rotation );
+			self.tmpVec3.x -= movementY/self.turningSpeed;
 			if( self.tmpVec3.x > -1.0 && // down boundry
 				self.tmpVec3.x < 1.4 ) { // up boundry 
-				self.body.children[0].rotation.x -= movementY/300;
+				self.camera.rotation.x -= movementY / self.turningSpeed;
 			}
-			self.body.rotation.y -= movementX/300;
+			self.body.rotation.y -= movementX / self.turningSpeed;
 					
 		}, false);
 	}
@@ -305,9 +321,6 @@ class Player extends Entity {
 			this.controls.running = trueOrFalse;
 		}
 		
-		if( evt.keyCode === 70 ){ // F
-			// Light
-		}
 		
 		if( evt.keyCode === 81 ){ // Q
 			this.controls.turning.left = trueOrFalse;
