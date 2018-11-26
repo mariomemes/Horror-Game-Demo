@@ -31,7 +31,7 @@ Levels[0].initModels = function(){
 				light.shadow.bias = 0.0001;
 			}
 			
-			//Levels[0].Lights.push( light );
+			Levels[0].Lights.push( light );
 
 			// let help = new THREE.PointLightHelper( light, 0.2 );
 			// Levels[0].scene.add( help );

@@ -23,7 +23,7 @@ class Entity {
 	constructor( data ){
 		this.body = new THREE.Group();
 		this.cylinder = new THREE.Mesh( 
-			new THREE.CylinderBufferGeometry( 0.9 , 0.9 , playerStats.height, 64 ),
+			new THREE.CylinderBufferGeometry( 1.0 , 1.0 , playerStats.height, 64 ),
 			new THREE.MeshLambertMaterial({ 
 				color: 0xff0000,
 				flatShading: true,
@@ -58,17 +58,17 @@ class Player extends Entity {
 			right: new THREE.Raycaster(),
 		};
 		this.speedWalking = playerStats.speed;
-		this.sideWalkingSpeed = playerStats.speed * 0.6;
-		this.runningSpeed = playerStats.speed * 1.7;
+		this.sideWalkingSpeed = playerStats.speed * 0.7;
+		this.runningSpeed = playerStats.speed * 5.7; // 1.7
 		this.turningSpeed = 300.0;
 		this.pHeight = playerStats.height;
 		this.body.tmpPosition = new THREE.Vector3().copy( data.pos );
 		this.tmpVec3 = new THREE.Vector3();
 		
 		this.neck = new THREE.Object3D();
-		this.neck.position.y = -2;
+		this.neck.position.y = -2.0;
 		this.camera = data.camera;
-		this.camera.position.y += 2;
+		this.camera.position.y += 2.0;
 		this.neck.add( data.camera );
 		this.body.add( this.neck );
 		
@@ -76,11 +76,12 @@ class Player extends Entity {
 		this.cylinder.position.y -= this.pHeight/2;
 		
 		// Lantern
-		this.lanternON = true;
-		this.lanternLight = new THREE.PointLight( 0x0000dd , 0.9 , 20 , 2 );
+		this.hasLantern = true;
+		this.lanternON = false;
+		this.lanternLight = new THREE.PointLight( 0x00dd00 , 1.7 , 30 , 2 );
 		this.lantern = new THREE.Mesh(
 			new THREE.CylinderBufferGeometry( 0.1 , 0.1 , 0.5 , 10 ),
-			new THREE.MeshBasicMaterial({ color: 0x000099 })
+			new THREE.MeshBasicMaterial({ color: 0x009900 })
 		);
 		this.lantern.add( this.lanternLight );
 		this.body.add( this.lantern );
@@ -272,7 +273,7 @@ class Player extends Entity {
 			self.keyset( evt , true );
 			// console.log( evt );
 			
-			if( evt.keyCode === 70 ){ // F
+			if( evt.keyCode === 70 && self.hasLantern ){ // F
 				self.lanternON = !self.lanternON;
 			}
 			

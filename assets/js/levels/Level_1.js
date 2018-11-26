@@ -9,6 +9,39 @@ Levels[1].initModels = function(){
 			-change empty objects into lamps
 		*/
 		
+		if( ( node.name.includes( "Box" ) ||
+			node.name.includes( "Barrel" ) ||
+			node.name.includes( "Wall" ) ||
+			node.name.includes( "Table" ) ) && 
+			node instanceof THREE.Mesh ){
+
+			Levels[1].staticCollideMesh.push( node );
+
+		}
+		
+		/* if( node.name === "Boxes" || node.name === "Barrels" ){
+			node.children.forEach( function(child){
+				console.count();
+				Levels[1].staticCollideMesh.push( child );
+			});
+		} */
+		
+		if( node.name.includes( "Lamp" ) ){
+			let light = new THREE.PointLight( 0xffffee, 0.8, 40 , 2 );
+			light.position.copy( node.position );
+			light.position.y = 18;
+			if(shadows){
+				light.castShadow = true;
+				light.shadow.mapSize.width = 512*1;
+				light.shadow.mapSize.height = 512*1;
+				light.shadow.camera.near = 0.1;
+				light.shadow.camera.far = 1000;
+				light.shadow.bias = 0.0001;
+			}
+			
+			Levels[1].Lights.push( light );
+		}
+		
 		if( shadows ){
 			node.castShadow = true;
 			node.receiveShadow = true;
@@ -31,7 +64,7 @@ Levels[1].initModels = function(){
 	});
 	
 	// Temporaary Lighting
-	let poses = [
+	/* let poses = [
 		new THREE.Vector3( 70 , 23 , 0 ),
 		new THREE.Vector3( -65 , 23 , 0 ),
 		new THREE.Vector3( -65 , 23 , -150 ),
@@ -56,7 +89,7 @@ Levels[1].initModels = function(){
 
 		let help = new THREE.PointLightHelper( light, 0.5 );
 		Levels[1].scene.add( help );
-	});
+	}); */
 	
 	
 	
@@ -79,6 +112,17 @@ Levels[1].initModels = function(){
 // ( 72 , 0 , 15.5 )
 Levels[1].constructCollisionBoxes = function() {
 	
+	Levels[1].staticCollideMesh.forEach( function( mesh ){
+		// Bounding Box
+		mesh.BBox = new THREE.Box3().setFromObject( mesh );
+
+		// helper
+		if( box3helpers ){
+			mesh.BBoxHelper = new THREE.Box3Helper( mesh.BBox , 0xff0000 );
+			Levels[1].scene.add( mesh.BBoxHelper );
+		}
+	});
+	
 }
 
 Levels[1].initLights = function(){
@@ -88,6 +132,12 @@ Levels[1].initLights = function(){
 	
 	Levels[1].Lights.forEach( function( light ){
 		Levels[1].scene.add( light );
+		
+		if( Levels[1].lightHelpers && light instanceof THREE.PointLight ) {
+			let lightHelp = new THREE.PointLightHelper( light, 0.5 );
+			Levels[1].scene.add( lightHelp );
+		}
 	});
 }
+
 

@@ -60,7 +60,7 @@ let init = function() {
 	scene0.background = new THREE.Color( 0x101020 );
 	scene1 = new THREE.Scene();
 
-	camera0 = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 10000 );
+	camera0 = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 1000 );
 
 	stats = new Stats();
 	document.body.appendChild( stats.dom );
@@ -83,7 +83,7 @@ let init = function() {
 	loadingManager.onLoad = function ( ) {
 		setTimeout( function(){ 
 			loadingFinished();
-			Levels[0].init();
+			Levels[1].init();
 			console.log( "finished loading" );
 		}, 0 );
 	};
@@ -138,6 +138,7 @@ Levels[1].init = function(){
 	currentLevel = 1;
 	
 	Levels[1].initModels();
+	Levels[1].constructCollisionBoxes();
 	Levels[1].initLights();
 	initPlayer({
 		position: Levels[1].playerPos,
