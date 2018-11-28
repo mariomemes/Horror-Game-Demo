@@ -45,10 +45,11 @@ Levels[0].initModels = function(){
 			node.material.map.image.src = baseUri + 'assets/models/Level_0_alt/box_wood.jpg';
 		}
 
-		if( node.name.includes( "Box" ) ||
+		if( ( node.name.includes( "Box" ) ||
 			node.name.includes( "Barrel" ) ||
 			node.name.includes( "Wall" ) ||
-			node.name.includes( "Table" ) ){
+			node.name.includes( "Table" ) ) && 
+			node instanceof THREE.Mesh ){
 
 			Levels[0].staticCollideMesh.push( node );
 

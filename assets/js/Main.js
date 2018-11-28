@@ -1,4 +1,6 @@
 let canvas = document.getElementById("myCanvas");
+let pointer = document.getElementById("pointer");
+
 let camera0, scene0, scene1, renderer, stats, controls;
 let loadingManager, textureLoader, gltfLoader;
 let currentLevel;
@@ -37,12 +39,14 @@ let Levels = [
 		Lights: [],
 		scene: null,
 		staticCollideMesh: [],
+		interractiveItems: [],
 		lightHelpers: true,
 	},
 	{
 		Lights: [],
 		scene: null,
 		staticCollideMesh: [],
+		interractiveItems: [],
 		lightHelpers: false,
 	}
 ];
@@ -203,6 +207,7 @@ let animate = function( time ) {
 	
 	if( loadingReady == false ){
 		LoadingScreen();
+		pointer.src = "assets/textures/pointer_empty.png";
 		return;
 	}
 	

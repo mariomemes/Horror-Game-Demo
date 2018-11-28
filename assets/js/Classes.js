@@ -57,6 +57,7 @@ class Player extends Entity {
 			left: new THREE.Raycaster(),
 			right: new THREE.Raycaster(),
 		};
+		this.mouseCoord = new THREE.Vector2( 0 , 0 );
 		this.speedWalking = playerStats.speed;
 		this.sideWalkingSpeed = playerStats.speed * 0.7;
 		this.runningSpeed = playerStats.speed * 5.7; // 1.7
@@ -112,6 +113,8 @@ class Player extends Entity {
 		// Setting Bounding Boxes and collision testing happens in move
 		this.updateGravity();
 		if( box3helpers ) this.body.BBoxHelper.update();
+		
+		this.raycastFront();
 		
 		if( this.lanternON ){
 			this.lantern.visible = true;
@@ -259,6 +262,20 @@ class Player extends Entity {
 		
 		if( intersects.down.length > num ){
 			this.body.position.y = intersects.down[0].point.y + this.pHeight;
+		}
+	}
+	
+	raycastFront(){
+		let intersects;
+		
+		this.rays.forward.setFromCamera( this.mouseCoord , this.camera );
+		
+		intersects = this.rays.forward.intersectObjects( Levels[currentLevel].interractiveItems );
+		
+		if( intersects.length > 0 ){
+			pointer.src = "assets/textures/pointer_hand.png";
+		} else {
+			pointer.src = "assets/textures/pointer.png";
 		}
 	}
 	

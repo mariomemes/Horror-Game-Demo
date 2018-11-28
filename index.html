@@ -8,10 +8,21 @@
 				margin: 0;
 				overflow: hidden;
 			}
+			#pointer{
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				z-index: 1;
+				transform: translate( -50% , -50% );
+				pointer-events: none;
+				user-select: none;
+			}
 		</style>
 	</head>
 	<body>
 		<canvas id="myCanvas"></canvas>
+		
+		<img id="pointer" src="assets/textures/pointer.png">
 		
 		<script src="assets/js/stats.min.js"></script>
 		<script src="assets/js/three.js"></script>

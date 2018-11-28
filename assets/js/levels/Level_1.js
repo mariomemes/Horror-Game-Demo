@@ -19,12 +19,12 @@ Levels[1].initModels = function(){
 
 		}
 		
-		/* if( node.name === "Boxes" || node.name === "Barrels" ){
-			node.children.forEach( function(child){
-				console.count();
-				Levels[1].staticCollideMesh.push( child );
-			});
-		} */
+		
+		if( node.name === "Radio" && node instanceof THREE.Mesh ){
+
+			Levels[1].interractiveItems.push( node );
+
+		}
 		
 		if( node.name.includes( "Lamp" ) ){
 			let light = new THREE.PointLight( 0xffffee, 0.8, 40 , 2 );
