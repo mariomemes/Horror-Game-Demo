@@ -14,7 +14,7 @@ let initPlayer = function( data ){
 		// if( box3helpers ) Levels[ currentLevel ].scene.add( player.body, player.body.BBoxHelper )
 		player.body.position.copy( data.position );
 		player.body.rotation.copy( data.rotation );
-		
+		console.log("teleporto");
 	}
 
 }
@@ -57,6 +57,7 @@ class Player extends Entity {
 			left: new THREE.Raycaster(),
 			right: new THREE.Raycaster(),
 		};
+		this.body.name = "PlayerObj";
 		this.mouseCoord = new THREE.Vector2( 0 , 0 );
 		this.speedWalking = playerStats.speed;
 		this.sideWalkingSpeed = playerStats.speed * 0.7;
@@ -300,6 +301,10 @@ class Player extends Entity {
 				}
 				else exitPointerLock(); 
 				
+			}
+			
+			if( evt.key === '[' ){
+				Levels[0].init();
 			}
 		}, false );
 		

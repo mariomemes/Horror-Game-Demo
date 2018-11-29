@@ -60,9 +60,9 @@ let init = function() {
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	}
 
-	scene0 = new THREE.Scene();
+	/* scene0 = new THREE.Scene();
 	scene0.background = new THREE.Color( 0x101020 );
-	scene1 = new THREE.Scene();
+	scene1 = new THREE.Scene(); */
 
 	camera0 = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 1000 );
 
@@ -87,8 +87,7 @@ let init = function() {
 	loadingManager.onLoad = function ( ) {
 		setTimeout( function(){ 
 			loadingFinished();
-			Levels[1].init();
-			console.log( "finished loading" );
+			Levels[0].init();
 		}, 0 );
 	};
 	loadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
@@ -123,22 +122,27 @@ let LoadingScreen = function() {
 }
 
 Levels[0].init = function(){
-	Levels[0].scene = scene0;
+	
 	currentLevel = 0;
 	
-	Levels[0].initModels();
-	Levels[0].initLights();
+	if( Levels[0].scene == null ) {
+		
+		Levels[0].scene = new THREE.Scene();
+		Levels[0].initModels();
+		Levels[0].initLights();
+		
+	} 
+	
 	initPlayer({
 		position: Levels[0].playerPos,
 		camera: camera0,
 		rotation: Levels[0].playerRot,
 	});
-	// Levels[1].init();
 	
 }
 
 Levels[1].init = function(){
-	Levels[1].scene = scene1;
+	Levels[1].scene = new THREE.Scene();
 	currentLevel = 1;
 	
 	Levels[1].initModels();
@@ -149,6 +153,7 @@ Levels[1].init = function(){
 		camera: camera0,
 		rotation: Levels[1].playerRot,
 	});
+	
 }
 
 let loadModels = function(){
@@ -186,21 +191,33 @@ let initTextures = function(){
 	Textures.grass.repeat.set( 20, 20 );
 }
 
-let clearScene = function( scene ){
-	while( scene.children.length > 0 ){
-		scene.remove( scene.children[0] );
-	}
+let clearScene = function( Scene ){
+	/* for( let i = Scene.children.length -1; i >= 0; i-- ){
+		let child = Scene.children[i];
+		Scene.remove( child );
+	} */
+	// Scene.children = [];
 }
 
-let renderProperScene = function(){
-	switch( currentLevel ){
-		case 0:
-			renderer.render( Levels[0], camera0 );
-			break;
-		case 1:
+let spam = function(num){
+	let x = 0;
+	
+	let f = {
+		func: function(){
+			// console.log( x );
+			Levels[0].init();
 			
-			break;
-	} 
+			x++;
+			if( x < num ) setTimeout( f.func, 1 );
+		}
+	};
+	
+	f.func();
+	
+	/* for( let i = 0; i<num; i++ ){
+		// Levels[0].init();
+		f.func();
+	} */
 }
 
 let animate = function( time ) {
