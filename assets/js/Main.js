@@ -60,9 +60,12 @@ let init = function() {
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	}
 
-	/* scene0 = new THREE.Scene();
+	scene0 = new THREE.Scene();
 	scene0.background = new THREE.Color( 0x101020 );
-	scene1 = new THREE.Scene(); */
+	scene1 = new THREE.Scene();
+	
+	Levels[0].scene = scene0;
+	Levels[1].scene = scene0;
 
 	camera0 = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 1000 );
 
@@ -125,13 +128,14 @@ Levels[0].init = function(){
 	
 	currentLevel = 0;
 	
-	if( Levels[0].scene == null ) {
+	// if( Levels[0].scene.children.length == 0 ) {
 		
-		Levels[0].scene = new THREE.Scene();
+		// Levels[0].scene = scene0;
 		Levels[0].initModels();
+		Levels[0].constructCollisionBoxes();
 		Levels[0].initLights();
 		
-	} 
+	// } 
 	
 	initPlayer({
 		position: Levels[0].playerPos,
@@ -139,20 +143,47 @@ Levels[0].init = function(){
 		rotation: Levels[0].playerRot,
 	});
 	
+	console.log( Levels[0].scene );
 }
 
 Levels[1].init = function(){
-	Levels[1].scene = new THREE.Scene();
+	
 	currentLevel = 1;
+	
+	/* if( Levels[1].scene == null ) {
+		
+		Levels[1].scene = scene0;
+		Levels[1].initModels();
+		Levels[1].constructCollisionBoxes();
+		Levels[1].initLights();
+	} */
+	
+	
+	
+	if( Levels[0].gltf.scene.parent == Levels[1].scene ) {
+		
+		disposeHierarchy( Levels[1].scene, disposeNode );
+		Levels[1].scene.remove( Levels[0].gltf.scene );
+	}
+	
+	if( Levels[1].gltf.scene.parent == Levels[1].scene ) {
+		
+		disposeHierarchy( Levels[1].scene, disposeNode );
+		Levels[1].scene.remove( Levels[1].gltf.scene );
+	}
 	
 	Levels[1].initModels();
 	Levels[1].constructCollisionBoxes();
 	Levels[1].initLights();
+	
+	
 	initPlayer({
 		position: Levels[1].playerPos,
 		camera: camera0,
 		rotation: Levels[1].playerRot,
 	});
+	
+	console.log( Levels[1].scene );
 	
 }
 
@@ -192,33 +223,72 @@ let initTextures = function(){
 }
 
 let clearScene = function( Scene ){
-	/* for( let i = Scene.children.length -1; i >= 0; i-- ){
+	for( let i = Scene.children.length -1; i >= 0; i-- ){
 		let child = Scene.children[i];
 		Scene.remove( child );
-	} */
+	}
 	// Scene.children = [];
 }
 
-let spam = function(num){
-	let x = 0;
+
+function disposeNode(node)
+{
+    if (node instanceof THREE.Mesh)
+    {
+        if (node.geometry)
+        {
+            node.geometry.dispose ();
+        }
+
+        if (node.material)
+        {
+            if (node.material instanceof THREE.MeshFaceMaterial)
+            {
+                $.each (node.material.materials, function (idx, mtrl)
+                {
+                    if (mtrl.map)           mtrl.map.dispose ();
+                    if (mtrl.lightMap)      mtrl.lightMap.dispose ();
+                    if (mtrl.bumpMap)       mtrl.bumpMap.dispose ();
+                    if (mtrl.normalMap)     mtrl.normalMap.dispose ();
+                    if (mtrl.specularMap)   mtrl.specularMap.dispose ();
+                    if (mtrl.envMap)        mtrl.envMap.dispose ();
+
+                    mtrl.dispose ();    // disposes any programs associated with the material
+                });
+            }
+            else
+            {
+                if (node.material.map)          node.material.map.dispose ();
+                if (node.material.lightMap)     node.material.lightMap.dispose ();
+                if (node.material.bumpMap)      node.material.bumpMap.dispose ();
+                if (node.material.normalMap)    node.material.normalMap.dispose ();
+                if (node.material.specularMap)  node.material.specularMap.dispose ();
+                if (node.material.envMap)       node.material.envMap.dispose ();
+
+                node.material.dispose ();   // disposes any programs associated with the material
+            }
+        }
+    }
+}   // disposeNode
+
+function disposeHierarchy (node, callback){
+	let removables = [];
 	
-	let f = {
-		func: function(){
-			// console.log( x );
-			Levels[0].init();
-			
-			x++;
-			if( x < num ) setTimeout( f.func, 1 );
-		}
-	};
+    for (var i = node.children.length - 1; i >= 0; i--)
+    {
+        var child = node.children[i];
+        disposeHierarchy(child, callback);
+        callback(child);
+		// removables.push( child );
+    }
 	
-	f.func();
-	
-	/* for( let i = 0; i<num; i++ ){
-		// Levels[0].init();
-		f.func();
-	} */
+	removables.forEach( function(rm){
+		node.remove( rm );
+	});
 }
+
+
+
 
 let animate = function( time ) {
 	

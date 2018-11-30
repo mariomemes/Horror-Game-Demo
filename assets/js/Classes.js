@@ -123,6 +123,7 @@ class Player extends Entity {
 		} else {
 			this.lantern.visible = false;
 		}
+		
 	}
 	
 	testCollision( axis ){
@@ -303,8 +304,11 @@ class Player extends Entity {
 				
 			}
 			
-			if( evt.key === '[' ){
+			if( evt.key === ',' ){
 				Levels[0].init();
+			}
+			if( evt.key === '.' ){
+				Levels[1].init();
 			}
 		}, false );
 		
