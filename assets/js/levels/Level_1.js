@@ -99,7 +99,7 @@ Levels[1].initModels = function(){
 	Levels[1].playerRot = new THREE.Euler( 0 , 90*Math.PI/180 , 0 );
 	
 	console.log( "corridor: " );
-	// console.log( Levels[1].gltf );
+	console.log( Levels[1].gltf );
 	
 	/* Levels[1].gltf.scene.children.forEach( function(obj, i) {
 		console.log(i);
@@ -131,11 +131,11 @@ Levels[1].initLights = function(){
 	Levels[1].Lights.push( ambientLight );
 	
 	Levels[1].Lights.forEach( function( light ){
-		Levels[1].scene.children[0].add( light );
+		Levels[1].scene.add( light );
 		
 		if( Levels[1].lightHelpers && light instanceof THREE.PointLight ) {
 			let lightHelp = new THREE.PointLightHelper( light, 0.5 );
-			Levels[1].scene.children[0].add( lightHelp );
+			Levels[1].scene.add( lightHelp );
 		}
 	});
 }

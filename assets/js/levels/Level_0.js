@@ -87,9 +87,10 @@ Levels[0].initModels = function(){
 		),
 		camera: camera0,
 	}); */
+	
+	Levels[0].constructCollisionBoxes();
 
-	console.log( "Room: " );
-	// console.log( Levels[0].gltf );
+	console.log( Levels[0].gltf );
 	Levels[0].scene.add( Levels[0].gltf.scene );
 	
 }
@@ -120,10 +121,10 @@ Levels[0].initLights = function(){
 	Levels[0].Lights.push( ambientLight );
 	
 	Levels[0].Lights.forEach( function( light ){
-		Levels[0].scene.children[0].add( light );
+		Levels[0].scene.add( light );
 		if( Levels[0].lightHelpers && light instanceof THREE.PointLight ) {
 			let lightHelp = new THREE.PointLightHelper( light, 0.2 );
-			Levels[0].scene.children[0].add( lightHelp );
+			Levels[0].scene.add( lightHelp );
 		}
 	});
 }
