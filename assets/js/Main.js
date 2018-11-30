@@ -6,6 +6,10 @@ let loadingManager, textureLoader, gltfLoader;
 let currentLevel;
 let Textures = {
 	grass: null,
+	walls: {
+		roughnessMap: null,
+		metalnessMap: null,
+	},
 };
 let clock = new THREE.Clock() , delta;
 let shadows = false;
@@ -196,6 +200,9 @@ let initTextures = function(){
 	Textures.grass.wrapS = THREE.RepeatWrapping;
 	Textures.grass.wrapT = THREE.RepeatWrapping;
 	Textures.grass.repeat.set( 20, 20 );
+	
+	Textures.walls.roughnessMap = textureLoader.load( "assets/models/Level_1/redbricks2b-rough.png" );
+	Textures.walls.metalnessMap = textureLoader.load( "assets/models/Level_1/redbricks2b-metalness.png" );
 }
 
 let clearScene = function( level ){

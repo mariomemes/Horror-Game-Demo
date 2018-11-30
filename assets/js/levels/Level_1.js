@@ -21,7 +21,10 @@ Levels[1].initModels = function(){
 		
 		
 		if( node.name === "Radio" && node instanceof THREE.Mesh ){
-
+			
+			node.clickEvent = function(){
+				// play music
+			};
 			Levels[1].interractiveItems.push( node );
 
 		}
@@ -43,7 +46,6 @@ Levels[1].initModels = function(){
 				});
 				console.log( scene0 );
 			}
-			console.log( node.clickEvent );
 			
 			Levels[1].interractiveItems.push( node );
 		}
@@ -83,37 +85,12 @@ Levels[1].initModels = function(){
 			node.material.roughness = 1;
 		}
 		
-	});
-	
-	// Temporaary Lighting
-	/* let poses = [
-		new THREE.Vector3( 70 , 23 , 0 ),
-		new THREE.Vector3( -65 , 23 , 0 ),
-		new THREE.Vector3( -65 , 23 , -150 ),
-		new THREE.Vector3( -215 , 23 , -150 ),
-		new THREE.Vector3( -215 , 23 , 0 ),
-		new THREE.Vector3( -365 , 23 , 0 )
-	];
-	poses.forEach(function(lig){
-		let light = new THREE.PointLight( 0xffffee, 1.5, 50 , 2 );
-		light.position.copy( lig );
-		light.position.y -= 1;
-		if(shadows){
-			light.castShadow = true;
-			light.shadow.mapSize.width = 512*1;
-			light.shadow.mapSize.height = 512*1;
-			light.shadow.camera.near = 0.1;
-			light.shadow.camera.far = 1000;
-			light.shadow.bias = 0.0001;
+		if( node.name.includes( "Wall" ) ){
+			node.material.metalnessMap = Textures.walls.metalnessMap;
+			node.material.roughnessMap = Textures.walls.roughnessMap;
 		}
 		
-		Levels[1].Lights.push( light );
-
-		let help = new THREE.PointLightHelper( light, 0.5 );
-		Levels[1].scene.add( help );
-	}); */
-	
-	
+	});
 	
 	Levels[1].playerPos = new THREE.Vector3().copy( Levels[1].gltf.scene.getObjectByName('Player').position );
 	// Levels[1].playerPos = new THREE.Vector3( 55 , 20 , 0 );
