@@ -36,6 +36,15 @@ Levels[0].initModels = function(){
 			// let help = new THREE.PointLightHelper( light, 0.2 );
 			// Levels[0].scene.add( help );
 		}
+		
+		if( node.name === "Door" && node instanceof THREE.Mesh ){
+			
+			node.clickEvent = Levels[1].init;
+			
+			Levels[0].interractiveItems.push( node );
+			
+
+		}
 
 		if( node.name.includes( "Box" ) ){
 			// "http://localhost:8080/models/room1/wood.png"

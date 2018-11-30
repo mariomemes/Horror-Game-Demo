@@ -59,13 +59,17 @@ class Player extends Entity {
 		};
 		this.body.name = "PlayerObj";
 		this.mouseCoord = new THREE.Vector2( 0 , 0 );
+		this.pHeight = playerStats.height;
+		this.reach = 4.0;
+		this.pointedObject = null;
+		
 		this.speedWalking = playerStats.speed;
 		this.sideWalkingSpeed = playerStats.speed * 0.7;
 		this.runningSpeed = playerStats.speed * 5.7; // 1.7
 		this.turningSpeed = 300.0;
-		this.pHeight = playerStats.height;
+		
 		this.body.tmpPosition = new THREE.Vector3().copy( data.pos );
-		this.tmpVec3 = new THREE.Vector3();
+		this.tmpVec3 = new THREE.Vector3(); // used for limiting head rotations
 		
 		this.neck = new THREE.Object3D();
 		this.neck.position.y = -2.0;
@@ -271,12 +275,20 @@ class Player extends Entity {
 		
 		this.rays.forward.setFromCamera( this.mouseCoord , this.camera );
 		
-		intersects = this.rays.forward.intersectObjects( Levels[currentLevel].interractiveItems );
+		intersects = this.rays.forward.intersectObjects( Levels[currentLevel].interractiveItems , true );
 		
 		if( intersects.length > 0 ){
-			pointer.src = "assets/textures/pointer_hand.png";
+			if( intersects[0].distance <= this.reach ){
+				pointer.src = "assets/textures/pointer_hand.png";
+				this.pointedObject = intersects[0].object;
+			} else {
+				pointer.src = "assets/textures/pointer.png";
+				this.pointedObject = null;
+			}
+			
 		} else {
 			pointer.src = "assets/textures/pointer.png";
+			this.pointedObject = null;
 		}
 	}
 	
@@ -331,6 +343,27 @@ class Player extends Entity {
 			self.body.rotation.y -= movementX / self.turningSpeed;
 					
 		}, false);
+		
+		canvas.addEventListener('mousedown', function(evt){
+			
+			evt.preventDefault();
+			if( evt.button === 0 ){ // LMB
+				// console.log("ja klikam, a ty?");
+				if( self.pointedObject != null ){
+					if( self.pointedObject.clickEvent != null ){
+						self.pointedObject.clickEvent();
+					}	else {
+						self.pointedObject.parent.clickEvent();
+					}
+				}
+			}
+					
+		}, false);
+		
+		canvas.addEventListener('contextmenu', function (evt) { // Not compatible with IE < 9
+			evt.preventDefault();
+		}, false);
+		
 	}
 	
 	keyset( evt , trueOrFalse ){
@@ -349,6 +382,7 @@ class Player extends Entity {
 		
 		if( evt.key === 'Shift' ) {
 			this.controls.running = trueOrFalse;
+			// evt.preventDefault();
 		}
 		
 		

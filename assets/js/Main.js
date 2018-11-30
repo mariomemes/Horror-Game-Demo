@@ -89,7 +89,7 @@ let init = function() {
 	loadingManager.onLoad = function ( ) {
 		setTimeout( function(){ 
 			loadingFinished();
-			Levels[0].init();
+			Levels[1].init();
 		}, 0 );
 	};
 	loadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
@@ -123,8 +123,8 @@ let LoadingScreen = function() {
 	renderer.render( ls.scene, ls.camera );
 }
 
-Levels[0].init = function(){
-	
+Levels[0].init = function( pos ){
+	let startPosition;
 	currentLevel = 0;
 	
 	clearScene( Levels[0] );
@@ -133,9 +133,10 @@ Levels[0].init = function(){
 	Levels[0].constructCollisionBoxes();
 	Levels[0].initLights();
 		
-	
+	if( pos instanceof THREE.Vector3 ) startPosition = new THREE.Vector3().copy( pos );
+	else startPosition = Levels[0].playerPos;
 	initPlayer({
-		position: Levels[0].playerPos,
+		position: startPosition,
 		camera: camera0,
 		rotation: Levels[0].playerRot,
 	});
@@ -143,7 +144,7 @@ Levels[0].init = function(){
 	console.log( scene0 );
 }
 
-Levels[1].init = function(){
+Levels[1].init = function( pos ){
 	
 	currentLevel = 1;
 	
@@ -152,6 +153,7 @@ Levels[1].init = function(){
 	Levels[1].initModels();
 	Levels[1].constructCollisionBoxes();
 	Levels[1].initLights();
+	
 	initPlayer({
 		position: Levels[1].playerPos,
 		camera: camera0,
