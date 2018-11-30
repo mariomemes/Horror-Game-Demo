@@ -60,9 +60,11 @@ let init = function() {
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	}
 
-	/* scene0 = new THREE.Scene();
+	scene0 = new THREE.Scene();
 	scene0.background = new THREE.Color( 0x101020 );
-	scene1 = new THREE.Scene(); */
+	scene1 = new THREE.Scene();
+	Levels[0].scene = scene0;
+	Levels[1].scene = scene0;
 
 	camera0 = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 1000 );
 
@@ -125,13 +127,12 @@ Levels[0].init = function(){
 	
 	currentLevel = 0;
 	
-	if( Levels[0].scene == null ) {
+	clearScene( Levels[0] );
+	
+	Levels[0].initModels();
+	Levels[0].constructCollisionBoxes();
+	Levels[0].initLights();
 		
-		Levels[0].scene = new THREE.Scene();
-		Levels[0].initModels();
-		Levels[0].initLights();
-		
-	} 
 	
 	initPlayer({
 		position: Levels[0].playerPos,
@@ -139,11 +140,14 @@ Levels[0].init = function(){
 		rotation: Levels[0].playerRot,
 	});
 	
+	console.log( scene0 );
 }
 
 Levels[1].init = function(){
-	Levels[1].scene = new THREE.Scene();
+	
 	currentLevel = 1;
+	
+	clearScene( Levels[1] );
 	
 	Levels[1].initModels();
 	Levels[1].constructCollisionBoxes();
@@ -154,6 +158,7 @@ Levels[1].init = function(){
 		rotation: Levels[1].playerRot,
 	});
 	
+	console.log( scene0 );
 }
 
 let loadModels = function(){
@@ -191,12 +196,18 @@ let initTextures = function(){
 	Textures.grass.repeat.set( 20, 20 );
 }
 
-let clearScene = function( Scene ){
-	/* for( let i = Scene.children.length -1; i >= 0; i-- ){
+let clearScene = function( level ){
+	let Scene = level.scene;
+	for( let i = Scene.children.length -1; i >= 0; i-- ){
 		let child = Scene.children[i];
-		Scene.remove( child );
-	} */
-	// Scene.children = [];
+		if( child != player.body ){
+			Scene.remove( child );
+			// console.log(child);
+		}
+	}
+	level.Lights = [];
+	level.staticCollideMesh = [];
+	level.interractiveItems = [];
 }
 
 let spam = function(num){
@@ -233,7 +244,7 @@ let animate = function( time ) {
 	delta = clock.getDelta();
 	player.update( delta );
 
-	renderer.render( Levels[currentLevel].scene , camera0 );
+	renderer.render( scene0 , camera0 );
 	requestAnimationFrame( animate );
 
 	stats.end();

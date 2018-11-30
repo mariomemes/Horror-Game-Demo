@@ -88,9 +88,9 @@ Levels[0].initModels = function(){
 		camera: camera0,
 	}); */
 	
-	Levels[0].constructCollisionBoxes();
-
-	console.log( Levels[0].gltf );
+	
+	console.log( "Room: " );
+	//console.log( Levels[0].gltf );
 	Levels[0].scene.add( Levels[0].gltf.scene );
 	
 }

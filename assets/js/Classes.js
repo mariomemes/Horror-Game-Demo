@@ -303,8 +303,11 @@ class Player extends Entity {
 				
 			}
 			
-			if( evt.key === '[' ){
+			if( evt.key === '1' ){
 				Levels[0].init();
+			}
+			if( evt.key === '2' ){
+				Levels[1].init();
 			}
 		}, false );
 		

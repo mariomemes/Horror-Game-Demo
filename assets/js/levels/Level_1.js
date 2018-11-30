@@ -99,7 +99,7 @@ Levels[1].initModels = function(){
 	Levels[1].playerRot = new THREE.Euler( 0 , 90*Math.PI/180 , 0 );
 	
 	console.log( "corridor: " );
-	console.log( Levels[1].gltf );
+	//console.log( Levels[1].gltf );
 	
 	/* Levels[1].gltf.scene.children.forEach( function(obj, i) {
 		console.log(i);
