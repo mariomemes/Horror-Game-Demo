@@ -10,6 +10,11 @@ let Textures = {
 		roughnessMap: null,
 		metalnessMap: null,
 	},
+	floor: {
+		lightMap: null,
+		alphaMap: null, 
+		blackMap: null,
+	},
 };
 let clock = new THREE.Clock() , delta;
 let shadows = false;
@@ -93,7 +98,7 @@ let init = function() {
 	loadingManager.onLoad = function ( ) {
 		setTimeout( function(){ 
 			loadingFinished();
-			Levels[1].init();
+			Levels[0].init();
 		}, 0 );
 	};
 	loadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
@@ -169,7 +174,8 @@ Levels[1].init = function( pos ){
 
 let loadModels = function(){
 
-	gltfLoader.load( '/assets/models/Level_0_alt/room1_ver2.gltf',
+	// gltfLoader.load( '/assets/models/Level_0_alt/glb/room1_ver2.glb',
+	gltfLoader.load( '/assets/models/Level_0/room1_ver2.gltf',
 		function ( gltf ) {
 			
 			Levels[0].gltf = gltf;
@@ -203,6 +209,12 @@ let initTextures = function(){
 	
 	Textures.walls.roughnessMap = textureLoader.load( "assets/models/Level_1/redbricks2b-rough.png" );
 	Textures.walls.metalnessMap = textureLoader.load( "assets/models/Level_1/redbricks2b-metalness.png" );
+	
+	Textures.floor.lightMap = textureLoader.load( "assets/models/Level_0/floor_bake.png" );
+	Textures.floor.alphaMap = textureLoader.load( "assets/models/Level_0/negative_shadows.jpg" );
+	// Textures.floorLightMap.wrapT = THREE.RepeatWrapping;
+	// Textures.floorLightMap.repeat.set( 4 , 4 );
+	
 }
 
 let clearScene = function( level ){

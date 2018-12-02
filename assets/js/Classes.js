@@ -23,7 +23,7 @@ class Entity {
 	constructor( data ){
 		this.body = new THREE.Group();
 		this.cylinder = new THREE.Mesh( 
-			new THREE.CylinderBufferGeometry( 1.0 , 1.0 , playerStats.height, 64 ),
+			new THREE.CylinderBufferGeometry( 0.9 , 0.9 , playerStats.height, 64 ),
 			new THREE.MeshLambertMaterial({ 
 				color: 0xff0000,
 				flatShading: true,
@@ -84,15 +84,9 @@ class Player extends Entity {
 		// Lantern
 		this.hasLantern = true;
 		this.lanternON = false;
-		this.lanternLight = new THREE.PointLight( 0x00dd00 , 1.7 , 30 , 2 );
-		this.lantern = new THREE.Mesh(
-			new THREE.CylinderBufferGeometry( 0.1 , 0.1 , 0.5 , 10 ),
-			new THREE.MeshBasicMaterial({ color: 0x009900 })
-		);
-		this.lantern.add( this.lanternLight );
-		this.body.add( this.lantern );
-		this.lantern.position.set( 0.3 , -0.5 , -0.5 );
-		
+		this.lanternCD = 0;
+		this.lanternCDmax = 30;
+		this.buildLantern();
 		
 		this.body.position.copy( data.pos );
 		this.body.rotation.copy( data.rotation );
@@ -121,12 +115,7 @@ class Player extends Entity {
 		
 		this.raycastFront();
 		
-		if( this.lanternON ){
-			this.lantern.visible = true;
-			
-		} else {
-			this.lantern.visible = false;
-		}
+		if( this.lanternCD > 0 ) this.lanternCD--;
 	}
 	
 	testCollision( axis ){
@@ -293,6 +282,82 @@ class Player extends Entity {
 	}
 	
 	switchLight(){
+		let self = this;
+		
+		let lanternAnimation = function( ON, miliseconds ){
+			
+			if( ON == true ){ // switch off
+				
+				setTimeout( function(){
+					if( self.lanternLight.intensity <= 0 ){
+						self.lantern.material.emissive.g = 0;
+						self.lanternLight.intensity = 0;
+						return; // color is 0, job is done
+					} else {
+						self.lantern.material.emissive.g -= 0.5/miliseconds;
+						self.lanternLight.intensity -= 1.7/miliseconds;
+						
+						return lanternAnimation( true, miliseconds )
+					}
+				}, 1000/60);
+				
+			} else { // switch on
+				
+				setTimeout( function(){
+					if( self.lanternLight.intensity >= 1.7 ){
+						return;	
+					} else {
+						self.lantern.material.emissive.g += 0.5/miliseconds;
+						self.lanternLight.intensity += 1.7/miliseconds;
+						
+						return lanternAnimation( false, miliseconds )
+					}
+				}, 1000/60);
+				
+			}
+		};
+		
+		if( this.lanternCD === 0 ){
+			if( this.lanternON ){ // switch off
+				
+				lanternAnimation( true, 10 );
+				
+			} else { // switch on
+				
+				lanternAnimation( false, 10 );
+				
+			}
+			this.lanternON = !this.lanternON;
+			this.lanternCD = this.lanternCDmax;
+		}
+	}
+	
+	buildLantern(){
+		
+		this.lanternLight = new THREE.PointLight( 0x00dd00 , 0.0 , 25 , 2 );
+		this.lanternLight.position.set( -0.05 , 0 , 0.2 );
+		this.lantern = new THREE.Mesh(
+			new THREE.CylinderBufferGeometry( 0.05 , 0.05 , 0.6 , 20 ),
+			new THREE.MeshPhongMaterial({ color:0x888888, transparent: true, opacity: 0.94, shininess: 30 })
+		);
+		let capGeometry = new THREE.CylinderBufferGeometry( 0.06 , 0.06 , 0.10 , 10 );
+		
+		this.lantern.capUp = new THREE.Mesh(
+			capGeometry,
+			new THREE.MeshPhongMaterial({ color: 0x999999, flatShading: true })
+		);
+		this.lantern.capUp.position.y += 0.3;
+		this.lantern.capDown = new THREE.Mesh(
+			capGeometry,
+			new THREE.MeshPhongMaterial({ color: 0x999999, flatShading: true })
+		);
+		this.lantern.capDown.position.y -= 0.3;
+		this.lantern.add( this.lantern.capUp, this.lantern.capDown );
+		
+		this.lantern.add( this.lanternLight );
+		this.body.add( this.lantern );
+		this.lantern.position.set( 0.24 , -0.4 , -0.3 );
+		this.lantern.rotation.x -= 25 *Math.PI/180;
 		
 	}
 	
@@ -303,10 +368,6 @@ class Player extends Entity {
 			self.keyset( evt , true );
 			// console.log( evt );
 			
-			if( evt.keyCode === 70 && self.hasLantern ){ // F
-				self.lanternON = !self.lanternON;
-			}
-			
 			if( evt.key === 'p' ){
 				if( pointerIsLocked( canvas ) === false ) {
 					startPointerLock();
@@ -315,12 +376,6 @@ class Player extends Entity {
 				
 			}
 			
-			if( evt.key === '1' ){
-				Levels[0].init();
-			}
-			if( evt.key === '2' ){
-				Levels[1].init();
-			}
 		}, false );
 		
 		window.addEventListener( 'keyup', function(evt){
@@ -336,8 +391,8 @@ class Player extends Entity {
 			// restrict the camera x rotation
 			self.tmpVec3.copy( self.camera.rotation );
 			self.tmpVec3.x -= movementY/self.turningSpeed;
-			if( self.tmpVec3.x > -1.0 && // down boundry
-				self.tmpVec3.x < 1.4 ) { // up boundry 
+			if( self.tmpVec3.x > -0.9 && // down boundry
+				self.tmpVec3.x < 1.3 ) { // up boundry 
 				self.camera.rotation.x -= movementY / self.turningSpeed;
 			}
 			self.body.rotation.y -= movementX / self.turningSpeed;
@@ -348,7 +403,6 @@ class Player extends Entity {
 			
 			evt.preventDefault();
 			if( evt.button === 0 ){ // LMB
-				// console.log("ja klikam, a ty?");
 				if( self.pointedObject != null ){
 					if( self.pointedObject.clickEvent != null ){
 						self.pointedObject.clickEvent();
@@ -383,6 +437,10 @@ class Player extends Entity {
 		if( evt.key === 'Shift' ) {
 			this.controls.running = trueOrFalse;
 			// evt.preventDefault();
+		}
+		
+		if( evt.keyCode === 70 && this.hasLantern && trueOrFalse == true ){ // F
+			this.switchLight();
 		}
 		
 		
