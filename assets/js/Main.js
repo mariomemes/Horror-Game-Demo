@@ -1,9 +1,12 @@
 let canvas = document.getElementById("myCanvas");
 let pointer = document.getElementById("pointer");
 
-let camera0, scene0, scene1, renderer, stats, controls;
-let loadingManager, textureLoader, gltfLoader;
+let camera0, scene0, scene1, renderer, stats, controls, audioListener;
+let loadingManager, textureLoader, gltfLoader, audioLoader;
+let clock, delta;
 let currentLevel;
+
+// Files
 let Textures = {
 	grass: null,
 	walls: {
@@ -16,7 +19,12 @@ let Textures = {
 		blackMap: null,
 	},
 };
-let clock = new THREE.Clock() , delta;
+let Sounds = {
+	footsteps: null,
+	doorOpening: null,
+};
+
+
 let shadows = false;
 let box3helpers = false;
 
@@ -76,7 +84,12 @@ let init = function() {
 	Levels[1].scene = scene0;
 
 	camera0 = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 1000 );
+	
+	audioListener = new THREE.AudioListener();
+	camera0.add( audioListener );
 
+	clock = new THREE.Clock();
+	
 	stats = new Stats();
 	document.body.appendChild( stats.dom );
 
@@ -114,7 +127,9 @@ let init = function() {
 	THREE.DRACOLoader.setDecoderPath( '/assets/js/draco/gltf/' );
 	THREE.DRACOLoader.setDecoderConfig({type: 'js'});
 	gltfLoader.setDRACOLoader( new THREE.DRACOLoader() );
+	audioLoader = new THREE.AudioLoader( loadingManager );
 	
+	initSounds();
 	initTextures();
 	loadModels();
 	
@@ -202,6 +217,9 @@ let loadModels = function(){
 }
 
 let initTextures = function(){
+	// THREE.RepeatWrapping; // 1000 
+	// THREE.ClampToEdgeWrapping; // 1001
+	// THREE.MirroredRepeatWrapping; // 1002
 	Textures.grass = textureLoader.load( "assets/textures/grass2.png" );
 	Textures.grass.wrapS = THREE.RepeatWrapping;
 	Textures.grass.wrapT = THREE.RepeatWrapping;
@@ -212,8 +230,10 @@ let initTextures = function(){
 	
 	Textures.floor.lightMap = textureLoader.load( "assets/models/Level_0/floor_bake.png" );
 	Textures.floor.alphaMap = textureLoader.load( "assets/models/Level_0/negative_shadows.jpg" );
-	// Textures.floorLightMap.wrapT = THREE.RepeatWrapping;
-	// Textures.floorLightMap.repeat.set( 4 , 4 );
+	
+}
+
+let initSounds = function(){
 	
 }
 
@@ -245,11 +265,6 @@ let spam = function(num){
 	};
 	
 	f.func();
-	
-	/* for( let i = 0; i<num; i++ ){
-		// Levels[0].init();
-		f.func();
-	} */
 }
 
 let animate = function( time ) {

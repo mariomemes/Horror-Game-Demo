@@ -50,8 +50,8 @@ Levels[0].initModels = function(){
 			// "http://localhost:8080/models/room1/wood.png"
 			// Bad texture naming led to a bug
 			let baseUri = node.material.map.image.baseURI;
-			node.material.map.image.currentSrc = baseUri + 'assets/models/Level_0_alt/box_wood.jpg';
-			node.material.map.image.src = baseUri + 'assets/models/Level_0_alt/box_wood.jpg';
+			node.material.map.image.currentSrc = baseUri + 'assets/models/Level_0/box_wood.jpg';
+			node.material.map.image.src = baseUri + 'assets/models/Level_0/box_wood.jpg';
 		}
 
 		if( ( node.name.includes( "Box" ) ||
@@ -84,28 +84,14 @@ Levels[0].initModels = function(){
 			node.material.metalnessMap = Textures.walls.metalnessMap;
 			node.material.roughnessMap = Textures.walls.roughnessMap;
 		}
-		
-		/* 
-0: -3.499199867248535
-1: 1.4997999668121338
-2: 4.499200344085693
-3: -0.49980008602142334
-4: -3.4992003440856934
-5: -0.49980008602142334
-6: 4.499200344085693
-7: 1.4997999668121338
-		*/
 
 		if( node.name === "Floor" ){
-			// THREE.RepeatWrapping; // 1000 
-			// THREE.ClampToEdgeWrapping; // 1001
-			// THREE.MirroredRepeatWrapping; // 1002
 			
 			node.geometry.computeBoundingBox();
 			let size = new THREE.Vector3();
 			node.geometry.boundingBox.getSize( size );
 			let geo = new THREE.PlaneBufferGeometry( size.x , size.z );
-			let mat = new THREE.MeshLambertMaterial({
+			let mat = new THREE.MeshBasicMaterial({
 				color: 0x000000,
 				alphaMap: Textures.floor.alphaMap,
 				transparent: true,
@@ -115,9 +101,6 @@ Levels[0].initModels = function(){
 			shadowPlane.position.set( 0 , 0.01 , 0 );
 			shadowPlane.rotation.x = -90 * Math.PI/180;
 			node.add( shadowPlane );
-			
-			/* console.log( node );
-			console.log( shadowPlane ); */
 		}
 
 	});

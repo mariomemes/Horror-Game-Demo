@@ -60,7 +60,7 @@ class Player extends Entity {
 		this.body.name = "PlayerObj";
 		this.mouseCoord = new THREE.Vector2( 0 , 0 );
 		this.pHeight = playerStats.height;
-		this.reach = 4.0;
+		this.reach = 4.5;
 		this.pointedObject = null;
 		
 		this.speedWalking = playerStats.speed;
