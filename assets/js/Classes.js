@@ -24,7 +24,7 @@ class Entity {
 		this.body = new THREE.Group();
 		this.body.name = "Body";
 		this.cylinder = new THREE.Mesh(
-			new THREE.CylinderBufferGeometry( 0.9 , 0.9 , playerStats.height, 64 ),
+			new THREE.CylinderBufferGeometry( 1.0 , 1.0 , playerStats.height, 64 ),
 			new THREE.MeshLambertMaterial({ 
 				color: 0xff0000,
 				flatShading: true,
@@ -45,6 +45,7 @@ class Player extends Entity {
 			left: false,
 			right: false,
 			running: false,
+			crouching: false,
 			turning: {
 				right: false,
 				left: false,
@@ -64,12 +65,15 @@ class Player extends Entity {
 		this.body.name = "PlayerObj";
 		this.mouseCoord = new THREE.Vector2( 0 , 0 );
 		this.pHeight = playerStats.height;
+		this.standingHeight = playerStats.height;
+		this.crouchingHeight = 3;
 		this.reach = 4.5;
 		this.pointedObject = null;
 		
 		this.walkingSpeed = playerStats.speed;
 		this.sideWalkingSpeed = playerStats.speed * 0.7;
 		this.runningSpeed = 2.0; // 2.0
+		this.crouchingSpeed = 0.5;
 		this.turningSpeed = 300.0;
 		
 		this.body.tmpPosition = new THREE.Vector3().copy( data.pos );
@@ -109,9 +113,16 @@ class Player extends Entity {
 		this.body.rotation.order = 'YXZ';
 		
 		this.initControls();
+		
+		let self = this;
+		setTimeout( function(){
+			self.ready = true;
+			audioListener.setMasterVolume( 1.0 ); // back to 1 after loading screen mute
+		}, 1000 );
 	}
 	
 	update( time ){
+		this.updateCrouching();
 		this.updateMovement( time );
 		// Setting Bounding Boxes and collision testing happens in move
 		this.updateGravity();
@@ -153,6 +164,14 @@ class Player extends Entity {
 	updateMovement( time ){
 		this.body.tmpPosition.copy( this.body.position );
 		
+		// Crouching
+		/* if( this.controls.crouching ){
+			this.pHeight = this.crouchingHeight;
+			console.log("CCC");
+		} else {
+			this.pHeight = this.standingHeight;
+		} */
+		
 		// TURNING
 		if( this.controls.turning.right == true ){ // E
 			// this.body.rotation.y -= this.turningSpeed/3 * Math.PI/180 * time;
@@ -189,7 +208,8 @@ class Player extends Entity {
 		if( this.controls.up == true ){ 
 		
 			speed = this.walkingSpeed;
-			if( this.controls.running ) speed *= this.runningSpeed;
+			if( this.controls.crouching ) speed *= this.crouchingSpeed;
+			else if( this.controls.running ) speed *= this.runningSpeed;
 			
 			this.body.position.x -= Math.sin( this.body.rotation.y ) * speed * time;
 			this.body.BBox.setFromObject( this.body );
@@ -203,7 +223,8 @@ class Player extends Entity {
 		if( this.controls.down == true ){ 
 			
 			speed = this.sideWalkingSpeed;
-			if( this.controls.running ) speed *= this.runningSpeed;
+			if( this.controls.crouching ) speed *= this.crouchingSpeed;
+			else if( this.controls.running ) speed *= this.runningSpeed;
 			
 			this.body.position.x += Math.sin( this.body.rotation.y ) * speed * time;
 			this.body.BBox.setFromObject( this.body );
@@ -219,7 +240,8 @@ class Player extends Entity {
 		if( this.controls.left == true ){  
 			
 			speed = this.sideWalkingSpeed;
-			if( this.controls.running ) speed *= this.runningSpeed;
+			if( this.controls.crouching ) speed *= this.crouchingSpeed;
+			else if( this.controls.running ) speed *= this.runningSpeed;
 			
 			this.body.position.x -= Math.sin( this.body.rotation.y + Math.PI/2 ) * speed * time;
 			this.body.BBox.setFromObject( this.body );
@@ -234,7 +256,8 @@ class Player extends Entity {
 		if( this.controls.right == true ){  
 			
 			speed = this.sideWalkingSpeed;
-			if( this.controls.running ) speed *= this.runningSpeed;
+			if( this.controls.crouching ) speed *= this.crouchingSpeed;
+			else if( this.controls.running ) speed *= this.runningSpeed;
 			
 			this.body.position.x -= Math.sin( this.body.rotation.y - Math.PI/2 ) * speed * time;
 			this.body.BBox.setFromObject( this.body );
@@ -247,7 +270,24 @@ class Player extends Entity {
 		
 	}
 	
+	updateCrouching(){
+		
+		if( this.controls.crouching ){ // crouching
+		
+			if( this.pHeight > this.crouchingHeight ){
+				this.pHeight -= 0.2;
+			}
+		} else { // standing
+		
+			if( this.pHeight < this.standingHeight ){
+				this.pHeight += 0.2;
+			}
+		}
+		
+	}
+	
 	updateGravity(){
+		
 		let intersects = {};
 		let num;
 		
@@ -255,22 +295,22 @@ class Player extends Entity {
 		
 		if( currentLevel === 0 ){
 			
-			intersects.down = this.rays.down.intersectObject(
+			intersects = this.rays.down.intersectObject(
 				Levels[0].scene.getObjectByName('Floor')
 			);
 			num = 0;
 			
 		} else if( currentLevel === 1 ){
 			
-			intersects.down = this.rays.down.intersectObjects([
+			intersects = this.rays.down.intersectObjects([
 				Levels[1].scene.getObjectByName('Floor'),
 				Levels[1].scene.getObjectByName('Stairs_body'),
 			]);
 			num = 1;
 		}
 		
-		if( intersects.down.length > num ){
-			this.body.position.y = intersects.down[0].point.y + this.pHeight;
+		if( intersects.length > 0 ){
+			this.body.position.y = intersects[0].point.y + this.pHeight;
 		}
 	}
 	
@@ -378,13 +418,15 @@ class Player extends Entity {
 	
 	walkingSound(){
 		
-		if( this.body.position.equals( this.body.tmpPosition ) ){ 
+		if( this.XZpositionUnchanged() ){ 
 			// standing in place
 			Sounds.footsteps.setVolume( 0.0 );
 			
 		} else { // moving
 			
-			if( this.controls.running ) {
+			if( this.controls.crouching ) {
+				Sounds.footsteps.setVolume( Sounds.footsteps.crouchingVolume );
+			} else if( this.controls.running ) {
 				Sounds.footsteps.setVolume( Sounds.footsteps.runningVolume );
 				Sounds.footsteps.setPlaybackRate( Sounds.footsteps.runningPlaybackRate );
 			} else { 
@@ -453,6 +495,13 @@ class Player extends Entity {
 		
 	}
 	
+	XZpositionUnchanged(){
+		
+		if( this.body.position.x === this.body.tmpPosition.x &&
+			this.body.position.z === this.body.tmpPosition.z ) return true;
+		else return false;
+	}
+	
 	keyset( evt , trueOrFalse, self ){
 		let moving = false;
 		
@@ -476,17 +525,19 @@ class Player extends Entity {
 		if( evt.key === 'Shift' ) {
 			this.controls.running = trueOrFalse;
 		}
-		
-		if( evt.keyCode === 70 && this.hasLantern && trueOrFalse == true ){ // F
-			this.switchLight();
+		if( evt.keyCode === 67 ) { // C == 67 , Ctrl == 17
+			this.controls.crouching = trueOrFalse;
 		}
-		
 		
 		if( evt.keyCode === 81 ){ // Q
 			this.controls.turning.left = trueOrFalse;
 		}
 		if( evt.keyCode === 69 ){ // E
 			this.controls.turning.right = trueOrFalse;
+		}
+		
+		if( evt.keyCode === 70 && this.hasLantern && trueOrFalse == true ){ // F
+			this.switchLight();
 		}
 		
 	}

@@ -18,6 +18,11 @@ let Textures = {
 		alphaMap: null, 
 		blackMap: null,
 	},
+	radio: {
+		normalMap: null,
+		aoMap: null,
+		specularMap: null,
+	},
 };
 let Sounds = {
 	footsteps: null,
@@ -112,8 +117,9 @@ let init = function() {
 	loadingManager.onLoad = function ( ) {
 		setTimeout( function(){ 
 			loadingFinished();
-			Levels[1].init();
-		}, 0 );
+		}, 1000 );
+		Levels[1].init();
+		
 	};
 	loadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
 		// console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
@@ -157,6 +163,7 @@ Levels[0].init = function( pos ){
 	Levels[0].initModels();
 	Levels[0].constructCollisionBoxes();
 	Levels[0].initLights();
+	if( Sounds.december.isPlaying ) Sounds.december.stop();
 		
 	if( pos instanceof THREE.Vector3 ) startPosition = new THREE.Vector3().copy( pos );
 	else startPosition = Levels[0].playerPos;
@@ -235,6 +242,7 @@ let initTextures = function(){
 }
 
 let initSounds = function(){
+	audioListener.setMasterVolume( 0.0 ); // update when loaded
 	
 	Sounds.footsteps = new THREE.Audio( audioListener );
 	audioLoader.load( 'assets/sounds/footsteps-concrete-denoised.ogg', function( buffer ) {
@@ -243,8 +251,10 @@ let initSounds = function(){
 		Sounds.footsteps.setVolume( 0.0 );
 		Sounds.footsteps.walkingVolume = 0.1;
 		Sounds.footsteps.runningVolume = 0.4;
+		Sounds.footsteps.crouchingVolume = 0.0;
 		Sounds.footsteps.walkingPlaybackRate = 1.2;
 		Sounds.footsteps.runningPlaybackRate = 2.0;
+		Sounds.footsteps.crouchingPlaybackRate = 0.5;
 		Sounds.footsteps.play();
 	});
 	
@@ -303,7 +313,7 @@ let animate = function( time ) {
 	stats.begin();
 	
 	delta = clock.getDelta();
-	player.update( delta );
+	if( player.ready ) player.update( delta );
 
 	renderer.render( scene0 , camera0 );
 	requestAnimationFrame( animate );

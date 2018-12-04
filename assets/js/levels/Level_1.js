@@ -22,14 +22,18 @@ Levels[1].initModels = function(){
 		
 		if( node.name === "Radio" && node instanceof THREE.Mesh ){
 			
+			Sounds.december.isPaused = true;
 			node.add( Sounds.december );
 			node.clickEvent = function(){
-				if( Sounds.december.isPlaying === false ){
+				if( Sounds.december.isPaused === true ){
 					Sounds.december.play();
+					Sounds.december.isPaused = false;
+				} else {
+					Sounds.december.pause();
+					Sounds.december.isPaused = true;
 				}
 			};
 			Levels[1].interractiveItems.push( node );
-
 		}
 		
 		if( node.name === "Door_1" && node instanceof THREE.Mesh ){
@@ -41,6 +45,7 @@ Levels[1].initModels = function(){
 				Levels[0].initModels();
 				Levels[0].constructCollisionBoxes();
 				Levels[0].initLights();
+				if( Sounds.december.isPlaying ) Sounds.december.stop();
 					
 				initPlayer({
 					position: new THREE.Vector3( -10 , 5 , -4 ),
