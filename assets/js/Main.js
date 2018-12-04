@@ -111,7 +111,7 @@ let init = function() {
 	loadingManager.onLoad = function ( ) {
 		setTimeout( function(){ 
 			loadingFinished();
-			Levels[0].init();
+			Levels[1].init();
 		}, 0 );
 	};
 	loadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
@@ -234,7 +234,17 @@ let initTextures = function(){
 }
 
 let initSounds = function(){
-	
+	Sounds.footsteps = new THREE.Audio( audioListener );
+	audioLoader.load( 'assets/sounds/footsteps-concrete-denoised.ogg', function( buffer ) {
+		Sounds.footsteps.setBuffer( buffer );
+		Sounds.footsteps.setLoop( true );
+		Sounds.footsteps.setVolume( 0.0 );
+		Sounds.footsteps.walkingVolume = 0.1;
+		Sounds.footsteps.runningVolume = 0.4;
+		Sounds.footsteps.walkingPlaybackRate = 1.2;
+		Sounds.footsteps.runningPlaybackRate = 2.0;
+		Sounds.footsteps.play();
+	});
 }
 
 let clearScene = function( level ){

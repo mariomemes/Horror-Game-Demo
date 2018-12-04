@@ -22,7 +22,8 @@ let initPlayer = function( data ){
 class Entity {
 	constructor( data ){
 		this.body = new THREE.Group();
-		this.cylinder = new THREE.Mesh( 
+		this.body.name = "Body";
+		this.cylinder = new THREE.Mesh(
 			new THREE.CylinderBufferGeometry( 0.9 , 0.9 , playerStats.height, 64 ),
 			new THREE.MeshLambertMaterial({ 
 				color: 0xff0000,
@@ -30,7 +31,7 @@ class Entity {
 				visible: false,
 			})
 		);
-		
+		this.cylinder.name = "Cylinder Body";
 	}
 }
 
@@ -57,15 +58,18 @@ class Player extends Entity {
 			left: new THREE.Raycaster(),
 			right: new THREE.Raycaster(),
 		};
+		this.sounds = {
+			footsteps: Sounds.footsteps,
+		};
 		this.body.name = "PlayerObj";
 		this.mouseCoord = new THREE.Vector2( 0 , 0 );
 		this.pHeight = playerStats.height;
 		this.reach = 4.5;
 		this.pointedObject = null;
 		
-		this.speedWalking = playerStats.speed;
+		this.walkingSpeed = playerStats.speed;
 		this.sideWalkingSpeed = playerStats.speed * 0.7;
-		this.runningSpeed = playerStats.speed * 5.7; // 1.7
+		this.runningSpeed = 2.0; // 2.0
 		this.turningSpeed = 300.0;
 		
 		this.body.tmpPosition = new THREE.Vector3().copy( data.pos );
@@ -86,6 +90,7 @@ class Player extends Entity {
 		this.lanternON = false;
 		this.lanternCD = 0;
 		this.lanternCDmax = 30;
+		this.lanternMaxIntensity = 1.4;
 		this.buildLantern();
 		
 		this.body.position.copy( data.pos );
@@ -103,7 +108,6 @@ class Player extends Entity {
 		
 		this.body.rotation.order = 'YXZ';
 		
-		
 		this.initControls();
 	}
 	
@@ -112,6 +116,7 @@ class Player extends Entity {
 		// Setting Bounding Boxes and collision testing happens in move
 		this.updateGravity();
 		if( box3helpers ) this.body.BBoxHelper.update();
+		this.walkingSound();
 		
 		this.raycastFront();
 		
@@ -178,14 +183,12 @@ class Player extends Entity {
 		}
 		
 		// MOVEMENT
+		let speed;
+		
 		// Forward
 		if( this.controls.up == true ){ 
-			let speed;
-			if( this.controls.running ) {
-				speed = this.runningSpeed;
-			} else {
-				speed = this.speedWalking;
-			}
+			speed = this.walkingSpeed;
+			if( this.controls.running ) speed *= this.runningSpeed;
 			
 			this.body.position.x -= Math.sin( this.body.rotation.y ) * speed * time;
 			this.body.BBox.setFromObject( this.body );
@@ -295,7 +298,7 @@ class Player extends Entity {
 						return; // color is 0, job is done
 					} else {
 						self.lantern.material.emissive.g -= 0.5/miliseconds;
-						self.lanternLight.intensity -= 1.7/miliseconds;
+						self.lanternLight.intensity -= self.lanternMaxIntensity / miliseconds;
 						
 						return lanternAnimation( true, miliseconds )
 					}
@@ -304,11 +307,11 @@ class Player extends Entity {
 			} else { // switch on
 				
 				setTimeout( function(){
-					if( self.lanternLight.intensity >= 1.7 ){
+					if( self.lanternLight.intensity >= self.lanternMaxIntensity ){
 						return;	
 					} else {
 						self.lantern.material.emissive.g += 0.5/miliseconds;
-						self.lanternLight.intensity += 1.7/miliseconds;
+						self.lanternLight.intensity += self.lanternMaxIntensity / miliseconds;
 						
 						return lanternAnimation( false, miliseconds )
 					}
@@ -358,7 +361,25 @@ class Player extends Entity {
 		this.body.add( this.lantern );
 		this.lantern.position.set( 0.24 , -0.4 , -0.3 );
 		this.lantern.rotation.x -= 25 *Math.PI/180;
+		this.lantern.name = "Glowstick";
+	}
+	
+	walkingSound(){
 		
+		if( this.body.position.equals( this.body.tmpPosition ) ){ 
+			// standing in place
+			Sounds.footsteps.setVolume( 0.0 );
+			
+		} else { // moving
+			
+			if( this.controls.running ) {
+				Sounds.footsteps.setVolume( Sounds.footsteps.runningVolume );
+				Sounds.footsteps.setPlaybackRate( Sounds.footsteps.runningPlaybackRate );
+			} else { 
+				Sounds.footsteps.setVolume( Sounds.footsteps.walkingVolume );
+				Sounds.footsteps.setPlaybackRate( Sounds.footsteps.walkingPlaybackRate );
+			}
+		}
 	}
 	
 	initControls(){
@@ -379,7 +400,7 @@ class Player extends Entity {
 		}, false );
 		
 		window.addEventListener( 'keyup', function(evt){
-			self.keyset( evt , false );
+			self.keyset( evt , false, self );
 		}, false );
 		
 		canvas.addEventListener('mousemove', function(evt){
@@ -420,23 +441,28 @@ class Player extends Entity {
 		
 	}
 	
-	keyset( evt , trueOrFalse ){
+	keyset( evt , trueOrFalse, self ){
+		let moving = false;
+		
 		if( evt.keyCode === 87 ){ // W
 			this.controls.up = trueOrFalse;
+			if( trueOrFalse === true ) moving = true;
 		}
 		if( evt.keyCode === 83 ){ // S
 			this.controls.down = trueOrFalse;
+			if( trueOrFalse === true ) moving = true;
 		}
 		if( evt.keyCode === 65 ){ // A
 			this.controls.left = trueOrFalse;
+			if( trueOrFalse === true ) moving = true;
 		}
 		if( evt.keyCode === 68 ){  // D
 			this.controls.right = trueOrFalse;
+			if( trueOrFalse === true ) moving = true;
 		}
 		
 		if( evt.key === 'Shift' ) {
 			this.controls.running = trueOrFalse;
-			// evt.preventDefault();
 		}
 		
 		if( evt.keyCode === 70 && this.hasLantern && trueOrFalse == true ){ // F
@@ -450,6 +476,7 @@ class Player extends Entity {
 		if( evt.keyCode === 69 ){ // E
 			this.controls.turning.right = trueOrFalse;
 		}
+		
 	}
 	
 }
