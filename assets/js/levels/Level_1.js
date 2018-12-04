@@ -22,8 +22,11 @@ Levels[1].initModels = function(){
 		
 		if( node.name === "Radio" && node instanceof THREE.Mesh ){
 			
+			node.add( Sounds.december );
 			node.clickEvent = function(){
-				// play music
+				if( Sounds.december.isPlaying === false ){
+					Sounds.december.play();
+				}
 			};
 			Levels[1].interractiveItems.push( node );
 

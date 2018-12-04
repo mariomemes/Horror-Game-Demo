@@ -22,6 +22,7 @@ let Textures = {
 let Sounds = {
 	footsteps: null,
 	doorOpening: null,
+	december: null,
 };
 
 
@@ -234,6 +235,7 @@ let initTextures = function(){
 }
 
 let initSounds = function(){
+	
 	Sounds.footsteps = new THREE.Audio( audioListener );
 	audioLoader.load( 'assets/sounds/footsteps-concrete-denoised.ogg', function( buffer ) {
 		Sounds.footsteps.setBuffer( buffer );
@@ -244,6 +246,19 @@ let initSounds = function(){
 		Sounds.footsteps.walkingPlaybackRate = 1.2;
 		Sounds.footsteps.runningPlaybackRate = 2.0;
 		Sounds.footsteps.play();
+	});
+	
+	Sounds.december = new THREE.PositionalAudio( audioListener );
+	audioLoader.load( 'assets/sounds/Once_Upon_A_December_distorted.ogg', function( buffer ) {
+		Sounds.december.setBuffer( buffer );
+		Sounds.december.setLoop( false );
+		Sounds.december.setVolume( 0.05 );
+		Sounds.december.setRefDistance( 1.0 ); // distance from which the sound weakens
+		
+		Sounds.december.setRolloffFactor( 0.2 );
+		Sounds.december.setDistanceModel( "inverse" );
+		// Sounds.december.setMaxDistance( 85 );
+		
 	});
 }
 
