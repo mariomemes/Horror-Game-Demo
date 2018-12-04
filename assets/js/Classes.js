@@ -90,7 +90,7 @@ class Player extends Entity {
 		this.lanternON = false;
 		this.lanternCD = 0;
 		this.lanternCDmax = 30;
-		this.lanternMaxIntensity = 1.4;
+		this.lanternMaxIntensity = 1.2;
 		this.buildLantern();
 		
 		this.body.position.copy( data.pos );
@@ -187,6 +187,7 @@ class Player extends Entity {
 		
 		// Forward
 		if( this.controls.up == true ){ 
+		
 			speed = this.walkingSpeed;
 			if( this.controls.running ) speed *= this.runningSpeed;
 			
@@ -197,40 +198,51 @@ class Player extends Entity {
 			this.body.position.z -= Math.cos( this.body.rotation.y ) * speed * time;
 			this.body.BBox.setFromObject( this.body );
 			this.testCollision('z');
-			
 		}
 		// Back
 		if( this.controls.down == true ){ 
-			this.body.position.x += Math.sin( this.body.rotation.y ) * this.sideWalkingSpeed * time;
+			
+			speed = this.sideWalkingSpeed;
+			if( this.controls.running ) speed *= this.runningSpeed;
+			
+			this.body.position.x += Math.sin( this.body.rotation.y ) * speed * time;
 			this.body.BBox.setFromObject( this.body );
 			this.testCollision('x');
 			
-			this.body.position.z += Math.cos( this.body.rotation.y ) * this.sideWalkingSpeed * time;
+			this.body.position.z += Math.cos( this.body.rotation.y ) * speed * time;
 			this.body.BBox.setFromObject( this.body );
 			this.testCollision('z');
 			
 		}
+		
 		// Left
-		if( this.controls.left == true ){ 
-			this.body.position.x -= Math.sin( this.body.rotation.y + Math.PI/2 ) * this.sideWalkingSpeed * time;
+		if( this.controls.left == true ){  
+			
+			speed = this.sideWalkingSpeed;
+			if( this.controls.running ) speed *= this.runningSpeed;
+			
+			this.body.position.x -= Math.sin( this.body.rotation.y + Math.PI/2 ) * speed * time;
 			this.body.BBox.setFromObject( this.body );
 			this.testCollision('x');
 			
-			this.body.position.z -= Math.cos( this.body.rotation.y + Math.PI/2 ) * this.sideWalkingSpeed * time;
+			this.body.position.z -= Math.cos( this.body.rotation.y + Math.PI/2 ) * speed * time;
 			this.body.BBox.setFromObject( this.body );
 			this.testCollision('z');
-			
 		}
+		
 		// Right
-		if( this.controls.right == true ){ 
-			this.body.position.x -= Math.sin( this.body.rotation.y - Math.PI/2 ) * this.sideWalkingSpeed * time;
+		if( this.controls.right == true ){  
+			
+			speed = this.sideWalkingSpeed;
+			if( this.controls.running ) speed *= this.runningSpeed;
+			
+			this.body.position.x -= Math.sin( this.body.rotation.y - Math.PI/2 ) * speed * time;
 			this.body.BBox.setFromObject( this.body );
 			this.testCollision('x');
 			
-			this.body.position.z -= Math.cos( this.body.rotation.y - Math.PI/2 ) * this.sideWalkingSpeed * time;
+			this.body.position.z -= Math.cos( this.body.rotation.y - Math.PI/2 ) * speed * time;
 			this.body.BBox.setFromObject( this.body );
 			this.testCollision('z');
-			
 		}
 		
 	}
