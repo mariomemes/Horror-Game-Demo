@@ -288,8 +288,7 @@ class Player extends Entity {
 	
 	updateGravity(){
 		
-		let intersects = {};
-		let num;
+		let intersects;
 		
 		this.rays.down.set( this.body.position , new THREE.Vector3( 0 , -1 , 0) );
 		
@@ -298,7 +297,6 @@ class Player extends Entity {
 			intersects = this.rays.down.intersectObject(
 				Levels[0].scene.getObjectByName('Floor')
 			);
-			num = 0;
 			
 		} else if( currentLevel === 1 ){
 			
@@ -306,7 +304,6 @@ class Player extends Entity {
 				Levels[1].scene.getObjectByName('Floor'),
 				Levels[1].scene.getObjectByName('Stairs_body'),
 			]);
-			num = 1;
 		}
 		
 		if( intersects.length > 0 ){

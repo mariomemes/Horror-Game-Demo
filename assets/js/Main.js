@@ -56,21 +56,32 @@ let player = {
 	}
 };
 
+// GAME
+let gameProgress = 0;
+
 // LEVELS
 let Levels = [
 	{
+		name: "Level 0",
 		Lights: [],
 		scene: null,
 		staticCollideMesh: [],
 		interractiveItems: [],
 		lightHelpers: true,
+		events: [
+			{},
+		],
 	},
 	{
+		name: "Level 1",
 		Lights: [],
 		scene: null,
 		staticCollideMesh: [],
 		interractiveItems: [],
 		lightHelpers: false,
+		events: [
+			{},
+		],
 	}
 ];
 
