@@ -57,7 +57,9 @@ let player = {
 };
 
 // GAME
-let gameProgress = 0;
+let GameState = {
+	progress:  0,
+};
 
 // LEVELS
 let Levels = [
@@ -129,7 +131,7 @@ let init = function() {
 		setTimeout( function(){ 
 			loadingFinished();
 		}, 1000 );
-		Levels[1].init();
+		Levels[0].init();
 		
 	};
 	loadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
@@ -184,7 +186,7 @@ Levels[0].init = function( pos ){
 		rotation: Levels[0].playerRot,
 	});
 	
-	console.log( scene0 );
+	console.log( Levels[0].scene );
 }
 
 Levels[1].init = function( pos ){
@@ -203,7 +205,7 @@ Levels[1].init = function( pos ){
 		rotation: Levels[1].playerRot,
 	});
 	
-	console.log( scene0 );
+	console.log( Levels[0].scene );
 }
 
 let loadModels = function(){
@@ -289,6 +291,9 @@ let clearScene = function( level ){
 		let child = Scene.children[i];
 		if( child != player.body ){
 			Scene.remove( child );
+			/* for( let j = child.children.length -1; j >= 0; j-- ){
+				child.remove( child.children[j] );
+			} */
 			// console.log(child);
 		}
 	}

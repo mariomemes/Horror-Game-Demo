@@ -90,12 +90,13 @@ class Player extends Entity {
 		this.cylinder.position.y -= this.pHeight/2;
 		
 		// Lantern
-		this.hasLantern = true;
 		this.lanternON = false;
 		this.lanternCD = 0;
 		this.lanternCDmax = 30;
 		this.lanternMaxIntensity = 1.2;
 		this.buildLantern();
+		if( GameState.progress >= 1 ) this.activateLantern();
+		
 		
 		this.body.position.copy( data.pos );
 		this.body.rotation.copy( data.rotation );
@@ -205,7 +206,7 @@ class Player extends Entity {
 		let speed;
 		
 		// Forward
-		if( this.controls.up == true ){ 
+		if( this.controls.up == true ){
 		
 			speed = this.walkingSpeed;
 			if( this.controls.crouching ) speed *= this.crouchingSpeed;
@@ -220,7 +221,7 @@ class Player extends Entity {
 			this.testCollision('z');
 		}
 		// Back
-		if( this.controls.down == true ){ 
+		if( this.controls.down == true ){
 			
 			speed = this.sideWalkingSpeed;
 			if( this.controls.crouching ) speed *= this.crouchingSpeed;
@@ -237,7 +238,7 @@ class Player extends Entity {
 		}
 		
 		// Left
-		if( this.controls.left == true ){  
+		if( this.controls.left == true ){ 
 			
 			speed = this.sideWalkingSpeed;
 			if( this.controls.crouching ) speed *= this.crouchingSpeed;
@@ -253,7 +254,7 @@ class Player extends Entity {
 		}
 		
 		// Right
-		if( this.controls.right == true ){  
+		if( this.controls.right == true ){
 			
 			speed = this.sideWalkingSpeed;
 			if( this.controls.crouching ) speed *= this.crouchingSpeed;
@@ -407,10 +408,33 @@ class Player extends Entity {
 		this.lantern.add( this.lantern.capUp, this.lantern.capDown );
 		
 		this.lantern.add( this.lanternLight );
+		this.lantern.position.set( 0.24 , -2.4 , -0.3 ); // 0.24 , -0.4 , -0.3
+		this.lantern.relativePositionY = -2.4;
 		this.body.add( this.lantern );
-		this.lantern.position.set( 0.24 , -0.4 , -0.3 );
 		this.lantern.rotation.x -= 25 *Math.PI/180;
 		this.lantern.name = "Glowstick";
+		
+		this.lantern.visible = false;
+	}
+	
+	activateLantern(){
+		let self = this;
+		
+		this.hasLantern = true;
+		this.lantern.visible = true;
+		
+		let step = 2.0 / 60;
+		let pullUp = setInterval(function(){
+			
+			if( self.lantern.relativePositionY < -0.4 ){
+				
+				self.lantern.relativePositionY += step;
+				self.lantern.position.y += step;
+				
+			} else {
+				clearInterval( pullUp );
+			}
+		}, 1000/60 );
 	}
 	
 	walkingSound(){

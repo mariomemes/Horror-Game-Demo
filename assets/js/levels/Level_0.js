@@ -87,20 +87,22 @@ Levels[0].initModels = function(){
 
 		if( node.name === "Floor" ){
 			
-			node.geometry.computeBoundingBox();
-			let size = new THREE.Vector3();
-			node.geometry.boundingBox.getSize( size );
-			let geo = new THREE.PlaneBufferGeometry( size.x , size.z );
-			let mat = new THREE.MeshBasicMaterial({
-				color: 0x000000,
-				alphaMap: Textures.floor.alphaMap,
-				transparent: true,
-			});
-			
-			let shadowPlane = new THREE.Mesh( geo, mat );
-			shadowPlane.position.set( 0 , 0.01 , 0 );
-			shadowPlane.rotation.x = -90 * Math.PI/180;
-			node.add( shadowPlane );
+			if( node.children.length === 0 ){
+				node.geometry.computeBoundingBox();
+				let size = new THREE.Vector3();
+				node.geometry.boundingBox.getSize( size );
+				let geo = new THREE.PlaneBufferGeometry( size.x , size.z );
+				let mat = new THREE.MeshBasicMaterial({
+					color: 0x000000,
+					alphaMap: Textures.floor.alphaMap,
+					transparent: true,
+				});
+				
+				let shadowPlane = new THREE.Mesh( geo, mat );
+				shadowPlane.position.y += 0.01;
+				shadowPlane.rotation.x = -90 * Math.PI/180;
+				node.add( shadowPlane );
+			}
 		}
 
 	});
@@ -119,12 +121,47 @@ Levels[0].initModels = function(){
 		),
 		camera: camera0,
 	}); */
-	
+	if( GameState.progress === 0 ) Levels[0].buildLanternOnTable();
 	
 	console.log( "Room: " );
 	//console.log( Levels[0].gltf );
 	Levels[0].scene.add( Levels[0].gltf.scene );
 	
+}
+
+Levels[0].buildLanternOnTable = function(){
+	
+	Levels[0].lantern = new THREE.Mesh(
+		new THREE.CylinderBufferGeometry( 0.05 , 0.05 , 0.6 , 20 ),
+		new THREE.MeshPhongMaterial({ color:0x888888, transparent: true, opacity: 0.94, shininess: 30 })
+	);
+	let capGeometry = new THREE.CylinderBufferGeometry( 0.06 , 0.06 , 0.10 , 10 );
+	
+	Levels[0].lantern.capUp = new THREE.Mesh(
+		capGeometry,
+		new THREE.MeshPhongMaterial({ color: 0x999999, flatShading: true })
+	);
+	Levels[0].lantern.capUp.position.y += 0.3;
+	Levels[0].lantern.capDown = new THREE.Mesh(
+		capGeometry,
+		new THREE.MeshPhongMaterial({ color: 0x999999, flatShading: true })
+	);
+	Levels[0].lantern.capDown.position.y -= 0.3;
+	Levels[0].lantern.add( Levels[0].lantern.capUp, Levels[0].lantern.capDown );
+	Levels[0].lantern.position.set( -4.0 , 3.0 , -1 );
+	Levels[0].lantern.scale.multiplyScalar( 2.0 );
+	
+	Levels[0].scene.add( Levels[0].lantern );
+	
+	Levels[0].interractiveItems.push( Levels[0].lantern );
+	Levels[0].lantern.clickEvent = function(){
+		Levels[0].scene.remove( Levels[0].lantern );
+		let i = Levels[0].interractiveItems.indexOf( Levels[0].lantern );
+		Levels[0].interractiveItems.splice( i , 1 );
+		
+		GameState.progress = 1;
+		player.activateLantern();
+	}
 }
 
 Levels[0].constructCollisionBoxes = function() {
