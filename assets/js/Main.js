@@ -286,6 +286,8 @@ let initSounds = function(){
 }
 
 let clearScene = function( level ){
+	player.ready = false;
+	
 	let Scene = level.scene;
 	for( let i = Scene.children.length -1; i >= 0; i-- ){
 		let child = Scene.children[i];
@@ -330,7 +332,7 @@ let animate = function( time ) {
 	
 	delta = clock.getDelta();
 	if( player.ready ) player.update( delta );
-
+	
 	renderer.render( scene0 , camera0 );
 	requestAnimationFrame( animate );
 

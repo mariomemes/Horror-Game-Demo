@@ -16,6 +16,11 @@ let initPlayer = function( data ){
 		player.body.rotation.copy( data.rotation );
 		console.log("teleporto");
 	}
+	
+	setTimeout( function(){
+		player.ready = true;
+		audioListener.setMasterVolume( 1.0 ); // back to 1 after loading screen mute
+	}, 4000 );
 
 }
 
@@ -115,11 +120,6 @@ class Player extends Entity {
 		
 		this.initControls();
 		
-		let self = this;
-		setTimeout( function(){
-			self.ready = true;
-			audioListener.setMasterVolume( 1.0 ); // back to 1 after loading screen mute
-		}, 1000 );
 	}
 	
 	update( time ){
@@ -164,6 +164,8 @@ class Player extends Entity {
 	
 	updateMovement( time ){
 		this.body.tmpPosition.copy( this.body.position );
+		
+		if( time * 60 > 2.0 ) time = 1.0/60;
 		
 		// Crouching
 		/* if( this.controls.crouching ){

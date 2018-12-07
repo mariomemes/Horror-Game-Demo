@@ -19,9 +19,9 @@ Levels[0].initModels = function(){
 	Levels[0].gltf.scene.traverse( function( node ) {
 		
 		if( node.name.includes( "Lamp" ) ) {
-			let light = new THREE.PointLight( 0xffffee, 1.5, 15 , 2 );
+			let light = new THREE.PointLight( 0xffffee, 1.0, 15 , 2 ); // 1.5
 			light.position.copy( node.position );
-			light.position.y += 1;
+			// light.position.y += 1;
 			if(shadows){
 				light.castShadow = true;
 				light.shadow.mapSize.width = 512*1;
