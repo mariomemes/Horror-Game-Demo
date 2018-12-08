@@ -39,7 +39,14 @@ Levels[0].initModels = function(){
 		
 		if( node.name === "Door" && node instanceof THREE.Mesh ){
 			
-			node.clickEvent = Levels[1].init;
+			node.clickEvent = function(){
+				if( GameState.progress >= 1 ){
+					Levels[1].init;
+				} else {
+					// Display message about the lantern
+				}
+			}
+			
 			
 			Levels[0].interractiveItems.push( node );
 			
