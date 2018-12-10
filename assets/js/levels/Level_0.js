@@ -41,7 +41,7 @@ Levels[0].initModels = function(){
 			
 			node.clickEvent = function(){
 				if( GameState.progress >= 1 ){
-					Levels[1].init;
+					Levels[1].init();
 				} else {
 					// Display message about the lantern
 				}
@@ -168,6 +168,7 @@ Levels[0].buildLanternOnTable = function(){
 		
 		GameState.progress = 1;
 		player.activateLantern();
+		setTimeout( Levels[0].turnOffLights, 2000 );
 	}
 }
 
@@ -190,6 +191,39 @@ Levels[0].constructCollisionBoxes = function() {
 			Levels[0].scene.add( mesh.BBoxHelper );
 		}
 	});
+}
+
+Levels[0].turnOffLights = function(){
+	
+	let lights = [];
+	Levels[0].Lights.forEach( function( light ){
+		if( light instanceof THREE.PointLight ) {
+			lights.push( light );
+		}
+	});
+	
+	let count = 0;
+	let lStartingIntensity = lights[0].intensity;
+	let length = 40; // in frames
+	let turnOff = setInterval( function(){
+		
+		if( count < length ){
+			
+			lights.forEach( function( light ){
+				light.intensity -= lStartingIntensity/length;
+			});
+			
+		} else {
+			clearInterval( turnOff );
+			
+			lights.forEach( function( light ){
+				light.intensity = 0;
+			});
+		}
+		count++;
+		
+	}, 1000/60 );
+	
 }
 
 Levels[0].initLights = function(){

@@ -425,7 +425,7 @@ class Player extends Entity {
 		this.hasLantern = true;
 		this.lantern.visible = true;
 		
-		let step = 2.0 / 60;
+		let step = 3.0 / 60;
 		let pullUp = setInterval(function(){
 			
 			if( self.lantern.relativePositionY < -0.4 ){
