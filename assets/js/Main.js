@@ -69,7 +69,7 @@ let Levels = [
 		scene: null,
 		staticCollideMesh: [],
 		interractiveItems: [],
-		lightHelpers: true,
+		lightHelpers: false,
 		events: [
 			{},
 		],
@@ -80,7 +80,7 @@ let Levels = [
 		scene: null,
 		staticCollideMesh: [],
 		interractiveItems: [],
-		lightHelpers: false,
+		lightHelpers: true,
 		events: [
 			{},
 		],

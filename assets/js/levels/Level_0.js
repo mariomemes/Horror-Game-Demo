@@ -204,22 +204,32 @@ Levels[0].turnOffLights = function(){
 	
 	let count = 0;
 	let lStartingIntensity = lights[0].intensity;
-	let length = 40; // in frames
+	let length = 30; // in frames
 	let turnOff = setInterval( function(){
 		
-		if( count < length ){
+		if( lights[0].intensity > 0 ){
 			
-			lights.forEach( function( light ){
-				light.intensity -= lStartingIntensity/length;
-			});
+			lights[0].intensity -= lStartingIntensity/length;
+			if( count === 30 - 29 ){
+				// play dying light sound
+				console.log( "boom" );
+			}
 			
-		} else {
+		} else if( lights[1].intensity > 0 && count > 90 ){
+			
+			lights[1].intensity -= lStartingIntensity/length;
+			if( count === 120 - 29 ){
+				// play dying light sound
+				console.log( "boom" );
+			}
+			
+		} else if( lights[1].intensity <= 0 ){
+			
+			lights[0].intensity = 0;
+			lights[1].intensity = 0;
 			clearInterval( turnOff );
-			
-			lights.forEach( function( light ){
-				light.intensity = 0;
-			});
 		}
+		
 		count++;
 		
 	}, 1000/60 );
