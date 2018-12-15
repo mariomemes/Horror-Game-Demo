@@ -62,6 +62,7 @@ Levels[1].initModels = function(){
 			let light = new THREE.PointLight( 0xffffee, 0.8, 40 , 2 );
 			light.position.copy( node.position );
 			light.position.y = 18;
+			// light.position.x += 10;
 			if(shadows){
 				light.castShadow = true;
 				light.shadow.mapSize.width = 512*1;
@@ -138,12 +139,15 @@ Levels[1].spawnMonster = function(){
 		body: Monsters.Creeper.body,
 		animationClips: Monsters.Creeper.animationClips,
 		// position: new THREE.Vector3( 10 , 0 , -5 ),
-		// position: new THREE.Vector3( -60 , 0 , -152 ),
-		position: new THREE.Vector3( 30 , 0 , 0 ),
-		scale: 0.5,
+		position: new THREE.Vector3( -60 , 0 , -152 ),
+		// position: new THREE.Vector3( 30 , 0 , 0 ),
+		scale: 0.7,
 		rotation: new THREE.Euler( 0 , -90 *Math.PI/180 , 0 ),
 		walkingSpeed: Monsters.Creeper.walkingSpeed,
 	});
+	
+	Levels[1].Creeper.body.children[1].material.color = new THREE.Color( 0.33, 0.25, 0.15 );
+	Levels[1].Creeper.body.add( Sounds.quietGrowl );
 }
 
 Levels[1].initLights = function(){
@@ -159,5 +163,31 @@ Levels[1].initLights = function(){
 		}
 	});
 }
+
+Levels[1].initEvents = function(){
+	
+	let FEevent = {
+		name: "First Encounter",
+		trigger: function(){
+			if( GameState.progress === 1 ){
+				
+				if( player.body.position.x <= -54 ){
+					GameState.progress = 2;
+					
+					// Start the monster
+					setTimeout( function(){
+						Levels[1].Creeper.initLevel1Scare();
+					}, 3000 );
+					
+					// Play sound
+					Sounds.quietGrowl.play();
+				}
+			}
+		},
+	};
+	
+	Levels[1].events.push( FEevent );
+}
+
 
 

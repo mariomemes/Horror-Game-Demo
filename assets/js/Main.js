@@ -2,7 +2,7 @@ let canvas = document.getElementById("myCanvas");
 let pointer = document.getElementById("pointer");
 
 let camera0, scene0, scene1, renderer, stats, controls, audioListener;
-let loadingManager, textureLoader, gltfLoader, audioLoader;
+let loadingManager, textureLoader, gltfLoader, FBXLoader, audioLoader;
 let clock, delta;
 let currentLevel;
 
@@ -22,6 +22,9 @@ let Textures = {
 		normalMap: null,
 		aoMap: null,
 		specularMap: null,
+	},
+	Creeper: {
+		skin: null,
 	},
 };
 let Sounds = {
@@ -62,7 +65,7 @@ let Monsters = {
 	array: [],
 	// Info of enemies
 	Creeper: {
-		walkingSpeed: 3.0,
+		walkingSpeed: 4.0,
 	},
 };
 
@@ -80,9 +83,7 @@ let Levels = [
 		staticCollideMesh: [],
 		interractiveItems: [],
 		lightHelpers: false,
-		events: [
-			{},
-		],
+		events: [],
 	},
 	{
 		name: "Level 1",
@@ -91,9 +92,7 @@ let Levels = [
 		staticCollideMesh: [],
 		interractiveItems: [],
 		lightHelpers: true,
-		events: [
-			{},
-		],
+		events: [],
 	}
 ];
 
@@ -158,9 +157,10 @@ let init = function() {
 	THREE.DRACOLoader.setDecoderConfig({type: 'js'});
 	gltfLoader.setDRACOLoader( new THREE.DRACOLoader() );
 	audioLoader = new THREE.AudioLoader( loadingManager );
+	FBXLoader = new THREE.FBXLoader( loadingManager );
 	
-	initSounds();
 	initTextures();
+	initSounds();
 	loadModels();
 	
 }
@@ -216,6 +216,8 @@ Levels[1].init = function( pos ){
 		rotation: Levels[1].playerRot,
 	});
 	
+	if( GameState.progress === 1 ) Levels[1].initEvents();
+	
 	console.log( Levels[0].scene );
 }
 
@@ -263,8 +265,9 @@ let loadModels = function(){
 				if( node instanceof THREE.SkinnedMesh && node instanceof THREE.Mesh ){
 					node.frustumCulled = false;
 				}
-				
 			} );
+			
+			gltf.scene.getObjectByName( "Creature" ).material.map = Textures.Creeper.skin;
 			
 			Monsters.Creeper.body = gltf.scene.children[0];
 			Monsters.Creeper.animationClips = gltf.animations;
@@ -275,6 +278,7 @@ let loadModels = function(){
 			console.log( 'Error happened: ' + error);
 		} */
 	);
+	
 }
 
 let initTextures = function(){
@@ -291,6 +295,7 @@ let initTextures = function(){
 	
 	Textures.floor.lightMap = textureLoader.load( "assets/models/Level_0/floor_bake.png" );
 	Textures.floor.alphaMap = textureLoader.load( "assets/models/Level_0/negative_shadows.jpg" );
+	Textures.Creeper.skin = textureLoader.load( "assets/models/Creeper_final/skin.png" );
 	
 }
 
@@ -319,10 +324,23 @@ let initSounds = function(){
 		Sounds.december.setRefDistance( 1.0 ); // distance from which the sound weakens
 		
 		Sounds.december.setRolloffFactor( 0.2 );
-		Sounds.december.setDistanceModel( "inverse" );
+		Sounds.december.setDistanceModel( "inverse" ); // default
 		// Sounds.december.setMaxDistance( 85 );
 		
 	});
+	
+	Sounds.quietGrowl = new THREE.PositionalAudio( audioListener );
+	audioLoader.load( 'assets/sounds/beast-growl-slow.ogg', function( buffer ) {
+		Sounds.quietGrowl.setBuffer( buffer );
+		Sounds.quietGrowl.setLoop( false );
+		Sounds.quietGrowl.setVolume( 1.0 );
+		Sounds.quietGrowl.setRefDistance( 1.0 ); // distance from which the sound weakens
+		
+		Sounds.quietGrowl.setRolloffFactor( 0.1 );
+		Sounds.quietGrowl.setDistanceModel( "inverse" ); // default
+		// Sounds.december.setMaxDistance( 85 );
+		
+	})
 }
 
 let clearScene = function( level ){
@@ -344,8 +362,9 @@ let clearScene = function( level ){
 	level.staticCollideMesh = [];
 	level.interractiveItems = [];
 	
-	// Clear enemies
 	Monsters.array = [];
+	
+	level.events = [];
 }
 
 let spam = function(num){
@@ -379,6 +398,9 @@ let animate = function( time ) {
 	for( let i = Monsters.array.length-1; i >= 0; i-- ){
 		Monsters.array[i].update( delta );
 	}
+	Levels[currentLevel].events.forEach( function(lEvent){
+		lEvent.trigger();
+	});
 	
 	renderer.render( scene0 , camera0 );
 	requestAnimationFrame( animate );

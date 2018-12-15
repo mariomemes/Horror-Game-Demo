@@ -1081,13 +1081,6 @@
     "samplers": [
         {}
     ],
-	"images" : [
-        {
-            "mimeType" : "image/png",
-            "name" : "skin",
-            "uri" : "skin.png"
-        }
-    ],
     "materials": [
         {
             "name": "skin_material",

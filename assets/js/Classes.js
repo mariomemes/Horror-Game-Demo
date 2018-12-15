@@ -499,6 +499,8 @@ class Player extends Entity {
 		
 		canvas.addEventListener('mousedown', function(evt){
 			
+			if( !self.ready ) return;
+			
 			evt.preventDefault();
 			if( evt.button === 0 ){ // LMB
 				if( self.pointedObject != null ){
