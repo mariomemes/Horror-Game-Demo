@@ -119,15 +119,7 @@ Levels[0].initModels = function(){
 	Levels[0].playerPos.y = playerStats.height;
 	Levels[0].playerRot = new THREE.Euler().copy( Levels[0].gltf.scene.getObjectByName('Player').rotation );
 
-	// initPlayer();
-	/* player = new Player({
-		pos: new THREE.Vector3( 
-			Levels[0].playerPos.x, 
-			playerStats.height, 
-			Levels[0].playerPos.z 
-		),
-		camera: camera0,
-	}); */
+	
 	if( GameState.progress === 0 ) Levels[0].buildLanternOnTable();
 	
 	console.log( "Room: " );

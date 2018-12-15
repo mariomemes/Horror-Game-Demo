@@ -56,9 +56,19 @@ let player = {
 	}
 };
 
+// MONSTERS
+let Monsters = {
+	// Array of enemies
+	array: [],
+	// Info of enemies
+	Creeper: {
+		walkingSpeed: 3.0,
+	},
+};
+
 // GAME
 let GameState = {
-	progress:  0,
+	progress: 1,
 };
 
 // LEVELS
@@ -131,7 +141,7 @@ let init = function() {
 		setTimeout( function(){ 
 			loadingFinished();
 		}, 1000 );
-		Levels[0].init();
+		Levels[1].init();
 		
 	};
 	loadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
@@ -197,6 +207,7 @@ Levels[1].init = function( pos ){
 	
 	Levels[1].initModels();
 	Levels[1].constructCollisionBoxes();
+	Levels[1].spawnMonster();
 	Levels[1].initLights();
 	
 	initPlayer({
@@ -235,6 +246,35 @@ let loadModels = function(){
 		}
 	);
 	
+	// gltfLoader.load( '/assets/models/Creeper2/alien_v3.gltf',
+	gltfLoader.load( '/assets/models/Creeper_final/alien.gltf',
+		function ( gltf ) {
+			
+			/* gltf.scene.children[0].traverse( function( node ){
+				if( node instanceof THREE.SkinnedMesh || node instanceof THREE.Mesh ){
+					node.material.metalness = 0;
+				}
+				if( node.name.includes( "eye" ) ){
+					node.material.color = new THREE.Color( 0 , 0 , 0 );
+				}
+			}); */
+			gltf.scene.traverse( function(node){
+				
+				if( node instanceof THREE.SkinnedMesh && node instanceof THREE.Mesh ){
+					node.frustumCulled = false;
+				}
+				
+			} );
+			
+			Monsters.Creeper.body = gltf.scene.children[0];
+			Monsters.Creeper.animationClips = gltf.animations;
+			
+		}, function ( xhr ) {
+			// console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+		}/* , function ( error ) {
+			console.log( 'Error happened: ' + error);
+		} */
+	);
 }
 
 let initTextures = function(){
@@ -288,6 +328,7 @@ let initSounds = function(){
 let clearScene = function( level ){
 	player.ready = false;
 	
+	// Clear all scene objects
 	let Scene = level.scene;
 	for( let i = Scene.children.length -1; i >= 0; i-- ){
 		let child = Scene.children[i];
@@ -302,6 +343,9 @@ let clearScene = function( level ){
 	level.Lights = [];
 	level.staticCollideMesh = [];
 	level.interractiveItems = [];
+	
+	// Clear enemies
+	Monsters.array = [];
 }
 
 let spam = function(num){
@@ -332,6 +376,9 @@ let animate = function( time ) {
 	
 	delta = clock.getDelta();
 	if( player.ready ) player.update( delta );
+	for( let i = Monsters.array.length-1; i >= 0; i-- ){
+		Monsters.array[i].update( delta );
+	}
 	
 	renderer.render( scene0 , camera0 );
 	requestAnimationFrame( animate );

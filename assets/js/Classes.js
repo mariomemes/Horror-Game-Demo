@@ -552,6 +552,10 @@ class Player extends Entity {
 			this.controls.crouching = trueOrFalse;
 		}
 		
+		if( evt.key === 'l' && trueOrFalse ) { // l for location
+			console.log( this.body.position );
+		}
+		
 		if( evt.keyCode === 81 ){ // Q
 			this.controls.turning.left = trueOrFalse;
 		}

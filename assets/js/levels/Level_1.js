@@ -132,9 +132,22 @@ Levels[1].constructCollisionBoxes = function() {
 	
 }
 
+Levels[1].spawnMonster = function(){
+	
+	Levels[1].Creeper = new Creeper({
+		body: Monsters.Creeper.body,
+		animationClips: Monsters.Creeper.animationClips,
+		// position: new THREE.Vector3( 10 , 0 , -5 ),
+		// position: new THREE.Vector3( -60 , 0 , -152 ),
+		position: new THREE.Vector3( 30 , 0 , 0 ),
+		scale: 0.5,
+		rotation: new THREE.Euler( 0 , -90 *Math.PI/180 , 0 ),
+		walkingSpeed: Monsters.Creeper.walkingSpeed,
+	});
+}
+
 Levels[1].initLights = function(){
 	let ambientLight = new THREE.AmbientLight( 0xffffff , 0.02 );
-	// let ambientLight = new THREE.AmbientLight( 0xffffff , 1.0 );
 	Levels[1].Lights.push( ambientLight );
 	
 	Levels[1].Lights.forEach( function( light ){
