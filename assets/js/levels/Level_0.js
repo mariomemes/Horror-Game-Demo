@@ -43,7 +43,10 @@ Levels[0].initModels = function(){
 				if( GameState.progress >= 1 ){
 					Levels[1].init();
 				} else {
-					// Display message about the lantern
+					MessageSystem.showMessage( 
+						Levels[0].messages.noLantern.text, 
+						Levels[0].messages.noLantern.duration 
+					);
 				}
 			}
 			
@@ -219,6 +222,10 @@ Levels[0].turnOffLights = function(){
 			
 			lights[0].intensity = 0;
 			lights[1].intensity = 0;
+			MessageSystem.showMessage( 
+				Levels[0].messages.howToUseLantern.text, 
+				Levels[0].messages.howToUseLantern.duration
+			);
 			clearInterval( turnOff );
 		}
 		
@@ -232,12 +239,15 @@ Levels[0].initLights = function(){
 	let ambientLight = new THREE.AmbientLight( 0xffffff , 0.02 );
 	Levels[0].Lights.push( ambientLight );
 	
-	Levels[0].Lights.forEach( function( light ){
-		Levels[0].scene.add( light );
-		if( Levels[0].lightHelpers && light instanceof THREE.PointLight ) {
-			let lightHelp = new THREE.PointLightHelper( light, 0.2 );
-			Levels[0].scene.add( lightHelp );
-		}
-	});
+	if( GameState.progress === 0 ){
+		
+		Levels[0].Lights.forEach( function( light ){
+			Levels[0].scene.add( light );
+			if( Levels[0].lightHelpers && light instanceof THREE.PointLight ) {
+				let lightHelp = new THREE.PointLightHelper( light, 0.2 );
+				Levels[0].scene.add( lightHelp );
+			}
+		});
+	}
 }
 

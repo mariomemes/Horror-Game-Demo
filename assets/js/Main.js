@@ -1,5 +1,6 @@
 let canvas = document.getElementById("myCanvas");
-let pointer = document.getElementById("pointer");
+let pointer = document.querySelector(".pointer");
+let messager = document.querySelector(".messager-container");
 
 let camera0, scene0, scene1, renderer, stats, controls, audioListener;
 let loadingManager, textureLoader, gltfLoader, FBXLoader, audioLoader;
@@ -31,6 +32,7 @@ let Sounds = {
 	footsteps: null,
 	doorOpening: null,
 	december: null,
+	quietGrowl: null,
 };
 
 
@@ -71,7 +73,7 @@ let Monsters = {
 
 // GAME
 let GameState = {
-	progress: 1,
+	progress: 0,
 };
 
 // LEVELS
@@ -84,6 +86,7 @@ let Levels = [
 		interractiveItems: [],
 		lightHelpers: false,
 		events: [],
+		messages: {},
 	},
 	{
 		name: "Level 1",
@@ -93,6 +96,7 @@ let Levels = [
 		interractiveItems: [],
 		lightHelpers: true,
 		events: [],
+		messages: {},
 	}
 ];
 
@@ -140,7 +144,7 @@ let init = function() {
 		setTimeout( function(){ 
 			loadingFinished();
 		}, 1000 );
-		Levels[1].init();
+		Levels[0].init();
 		
 	};
 	loadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
@@ -177,10 +181,11 @@ let LoadingScreen = function() {
 	renderer.render( ls.scene, ls.camera );
 }
 
-Levels[0].init = function( pos ){
-	let startPosition;
+Levels[0].init = function( pos, rot ){
+	let startPosition, startRotation;
 	currentLevel = 0;
 	
+	Sounds.footsteps.setVolume( 0.0 );
 	clearScene( Levels[0] );
 	
 	Levels[0].initModels();
@@ -190,11 +195,24 @@ Levels[0].init = function( pos ){
 		
 	if( pos instanceof THREE.Vector3 ) startPosition = new THREE.Vector3().copy( pos );
 	else startPosition = Levels[0].playerPos;
+	
+	if( rot instanceof THREE.Euler ) startRotation = new THREE.Euler().copy( rot );
+	else startRotation = Levels[0].playerRot;
+	
 	initPlayer({
 		position: startPosition,
 		camera: camera0,
-		rotation: Levels[0].playerRot,
+		rotation: startRotation,
 	});
+	
+	if( GameState.progress === 0 ) {
+		setTimeout( function(){
+			MessageSystem.showMessage( 
+				Levels[0].messages.instructions.text , 
+				Levels[0].messages.instructions.duration
+			);
+		}, 2000 )
+	}
 	
 	console.log( Levels[0].scene );
 }
@@ -203,6 +221,13 @@ Levels[1].init = function( pos ){
 	
 	currentLevel = 1;
 	
+	// audioListener.setMasterVolume( 0.0 );
+	/* for( let i in Sounds ){
+		if( Sounds[i] instanceof THREE.Audio || Sounds[i] instanceof THREE.PositionalAudio ){
+			Sounds[i].stop();
+		}
+	} */
+	Sounds.footsteps.setVolume( 0.0 );
 	clearScene( Levels[1] );
 	
 	Levels[1].initModels();

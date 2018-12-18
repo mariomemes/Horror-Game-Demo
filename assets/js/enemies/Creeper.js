@@ -79,6 +79,7 @@ class Creeper extends Enemy {
 			
 			if( this.body.position.x <= -85 ){
 				Levels[currentLevel].scene.remove( this.body );
+				Monsters.array.splice( Monsters.array.indexOf( this ) , 1 );
 			}
 		}
 	}

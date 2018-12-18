@@ -39,20 +39,11 @@ Levels[1].initModels = function(){
 		if( node.name === "Door_1" && node instanceof THREE.Mesh ){
 			
 			node.clickEvent = function(){
-				currentLevel = 0;
-				clearScene( Levels[0] );
 				
-				Levels[0].initModels();
-				Levels[0].constructCollisionBoxes();
-				Levels[0].initLights();
-				if( Sounds.december.isPlaying ) Sounds.december.stop();
-					
-				initPlayer({
-					position: new THREE.Vector3( -10 , 5 , -4 ),
-					camera: camera0,
-					rotation: new THREE.Euler( 0 , -90*Math.PI/180 , 0 ),
-				});
-				console.log( scene0 );
+				Levels[0].init( 
+					new THREE.Vector3( -10 , 5 , -4 ), 
+					new THREE.Euler( 0 , -90*Math.PI/180 , 0 ) 
+				);
 			}
 			
 			Levels[1].interractiveItems.push( node );

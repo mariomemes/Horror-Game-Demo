@@ -503,7 +503,9 @@ class Player extends Entity {
 			
 			evt.preventDefault();
 			if( evt.button === 0 ){ // LMB
+				
 				if( self.pointedObject != null ){
+					
 					if( self.pointedObject.clickEvent != null ){
 						self.pointedObject.clickEvent();
 					}	else {
