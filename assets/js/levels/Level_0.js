@@ -15,119 +15,131 @@ Levels[0].createStartingMesh = function(){
 Levels[0].initModels = function(){
 	
 	// Levels[0].gltf.scene.position.y += 0.01; // avoid Z fighting
-
-	Levels[0].gltf.scene.traverse( function( node ) {
-		
-		if( node.name.includes( "Lamp" ) ) {
-			let light = new THREE.PointLight( 0xffffee, 1.0, 15 , 2 ); // 1.5
-			light.position.copy( node.position );
-			// light.position.y += 1;
-			if(shadows){
-				light.castShadow = true;
-				light.shadow.mapSize.width = 512*1;
-				light.shadow.mapSize.height = 512*1;
-				light.shadow.camera.near = 0.1;
-				light.shadow.camera.far = 1000;
-				light.shadow.bias = 0.0001;
-			}
-			
-			Levels[0].Lights.push( light );
-
-			// let help = new THREE.PointLightHelper( light, 0.2 );
-			// Levels[0].scene.add( help );
-		}
-		
-		if( node.name === "Door" && node instanceof THREE.Mesh ){
-			
-			node.clickEvent = function(){
-				if( GameState.progress >= 1 ){
-					Levels[1].init();
-				} else {
-					MessageSystem.showMessage( 
-						Levels[0].messages.noLantern.text, 
-						Levels[0].messages.noLantern.duration 
-					);
-				}
-			}
+	
+	gltfLoader.load( '/assets/models/Level_0/room1_ver2.gltf',
+		function ( gltf ) {
 			
 			
-			Levels[0].interractiveItems.push( node );
-			
-
-		}
-
-		if( node.name.includes( "Box" ) ){
-			// "http://localhost:8080/models/room1/wood.png"
-			// Bad texture naming led to a bug
-			let baseUri = node.material.map.image.baseURI;
-			node.material.map.image.currentSrc = baseUri + 'assets/models/Level_0/box_wood.jpg';
-			node.material.map.image.src = baseUri + 'assets/models/Level_0/box_wood.jpg';
-		}
-
-		if( ( node.name.includes( "Box" ) ||
-			node.name.includes( "Barrel" ) ||
-			node.name.includes( "Wall" ) ||
-			node.name.includes( "Table" ) ) && 
-			node instanceof THREE.Mesh ){
-
-			Levels[0].staticCollideMesh.push( node );
-
-		}
-
-		if( node.name.includes( "Wall_Block" ) ){
-			// only serve as bounding boxes
-			node.visible = false;
-		}
-
-		if( shadows ){
-			node.castShadow = true;
-			node.receiveShadow = true;
-		}
-		
-		if( node instanceof THREE.Mesh ){
-			// console.log( " m: " + node.material.metalness + " r: " + node.material.roughness  );
-			node.material.metalness = 0;
-			node.material.roughness = 1;
-		}
-		
-		if( node.name.includes( "Room" ) || node.name.includes( "Floor" ) ){
-			node.material.metalnessMap = Textures.walls.metalnessMap;
-			node.material.roughnessMap = Textures.walls.roughnessMap;
-		}
-
-		if( node.name === "Floor" ){
-			
-			if( node.children.length === 0 ){
-				node.geometry.computeBoundingBox();
-				let size = new THREE.Vector3();
-				node.geometry.boundingBox.getSize( size );
-				let geo = new THREE.PlaneBufferGeometry( size.x , size.z );
-				let mat = new THREE.MeshBasicMaterial({
-					color: 0x000000,
-					alphaMap: Textures.floor.alphaMap,
-					transparent: true,
-				});
+			gltf.scene.traverse( function( node ) {
 				
-				let shadowPlane = new THREE.Mesh( geo, mat );
-				shadowPlane.position.y += 0.01;
-				shadowPlane.rotation.x = -90 * Math.PI/180;
-				node.add( shadowPlane );
-			}
+				if( node.name.includes( "Lamp" ) ) {
+					let light = new THREE.PointLight( 0xffffee, 1.0, 15 , 2 ); // 1.5
+					light.position.copy( node.position );
+					// light.position.y += 1;
+					if(shadows){
+						light.castShadow = true;
+						light.shadow.mapSize.width = 512*1;
+						light.shadow.mapSize.height = 512*1;
+						light.shadow.camera.near = 0.1;
+						light.shadow.camera.far = 1000;
+						light.shadow.bias = 0.0001;
+					}
+					
+					Levels[0].Lights.push( light );
+
+					// let help = new THREE.PointLightHelper( light, 0.2 );
+					// Levels[0].scene.add( help );
+				}
+				
+				if( node.name === "Door" && node instanceof THREE.Mesh ){
+					
+					node.clickEvent = function(){
+						if( GameState.progress >= 1 ){
+							Levels[1].init();
+						} else {
+							MessageSystem.showMessage( 
+								Levels[0].messages.noLantern.text, 
+								Levels[0].messages.noLantern.duration 
+							);
+						}
+					}
+					
+					
+					Levels[0].interractiveItems.push( node );
+					
+
+				}
+
+				if( node.name.includes( "Box" ) ){
+					// "http://localhost:8080/models/room1/wood.png"
+					// Bad texture naming led to a bug
+					let baseUri = node.material.map.image.baseURI;
+					node.material.map.image.currentSrc = baseUri + 'assets/models/Level_0/box_wood.jpg';
+					node.material.map.image.src = baseUri + 'assets/models/Level_0/box_wood.jpg';
+				}
+
+				if( ( node.name.includes( "Box" ) ||
+					node.name.includes( "Barrel" ) ||
+					node.name.includes( "Wall" ) ||
+					node.name.includes( "Table" ) ) && 
+					node instanceof THREE.Mesh ){
+
+					Levels[0].staticCollideMesh.push( node );
+
+				}
+
+				if( node.name.includes( "Wall_Block" ) ){
+					// only serve as bounding boxes
+					node.visible = false;
+				}
+
+				if( shadows ){
+					node.castShadow = true;
+					node.receiveShadow = true;
+				}
+				
+				if( node instanceof THREE.Mesh ){
+					// console.log( " m: " + node.material.metalness + " r: " + node.material.roughness  );
+					node.material.metalness = 0;
+					node.material.roughness = 1;
+				}
+				
+				if( node.name.includes( "Room" ) || node.name.includes( "Floor" ) ){
+					node.material.metalnessMap = Textures.walls.metalnessMap;
+					node.material.roughnessMap = Textures.walls.roughnessMap;
+				}
+
+				if( node.name === "Floor" ){
+					
+					if( node.children.length === 0 ){
+						node.geometry.computeBoundingBox();
+						let size = new THREE.Vector3();
+						node.geometry.boundingBox.getSize( size );
+						let geo = new THREE.PlaneBufferGeometry( size.x , size.z );
+						let mat = new THREE.MeshBasicMaterial({
+							color: 0x000000,
+							alphaMap: Textures.floor.alphaMap,
+							transparent: true,
+						});
+						
+						let shadowPlane = new THREE.Mesh( geo, mat );
+						shadowPlane.position.y += 0.01;
+						shadowPlane.rotation.x = -90 * Math.PI/180;
+						node.add( shadowPlane );
+					}
+				}
+
+			});
+
+			gltf.scene.getObjectByName('Player').visible = false;
+			Levels[0].playerPos = new THREE.Vector3().copy( gltf.scene.getObjectByName('Player').position );
+			Levels[0].playerPos.y = playerStats.height;
+			Levels[0].playerRot = new THREE.Euler().copy( gltf.scene.getObjectByName('Player').rotation );
+
+			
+			if( GameState.progress === 0 ) Levels[0].buildLanternOnTable();
+			
+			//console.log( gltf );
+			Levels[0].scene.add( gltf.scene );
+			
+			
+
+		}, function ( xhr ) {
+			// console.log( ( xhr.loaded / xhr.total * 100 ) + '% loaded' );
+		}, function ( error ) {
+			console.log( 'Error happened: ' + error);
 		}
-
-	});
-
-	Levels[0].gltf.scene.getObjectByName('Player').visible = false;
-	Levels[0].playerPos = new THREE.Vector3().copy( Levels[0].gltf.scene.getObjectByName('Player').position );
-	Levels[0].playerPos.y = playerStats.height;
-	Levels[0].playerRot = new THREE.Euler().copy( Levels[0].gltf.scene.getObjectByName('Player').rotation );
-
-	
-	if( GameState.progress === 0 ) Levels[0].buildLanternOnTable();
-	
-	console.log( "Room: " );
-	//console.log( Levels[0].gltf );
-	Levels[0].scene.add( Levels[0].gltf.scene );
+	);
 	
 }
 
