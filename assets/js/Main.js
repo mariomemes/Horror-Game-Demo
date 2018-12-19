@@ -1,11 +1,12 @@
 let canvas = document.getElementById("myCanvas");
 let pointer = document.querySelector(".pointer");
 let messager = document.querySelector(".messager-container");
+let waitingScreenDiv = document.querySelector(".waiting-screen");
 
 let camera0, scene0, scene1, renderer, stats, controls, audioListener;
 let loadingManager, textureLoader, gltfLoader, FBXLoader, audioLoader;
 let clock, delta;
-let currentLevel;
+let currentLevel = 0;
 
 // Files
 let Textures = {
@@ -27,6 +28,7 @@ let Textures = {
 	Creeper: {
 		skin: null,
 	},
+	loadingPics: [],
 };
 let Sounds = {
 	footsteps: null,
@@ -44,6 +46,16 @@ let loadingReady = false;
 let ls = {
 	scene: new THREE.Scene(),
 	camera: new THREE.PerspectiveCamera( 55, window.innerWidth/window.innerHeight, 0.1, 1000 ),
+	sphere: new THREE.Mesh( 
+		new THREE.SphereBufferGeometry(1), 
+		new THREE.MeshBasicMaterial({ color: 0xff0040, wireframe: true }),
+	),
+};
+
+// WAITING SCREEN
+let ws = {
+	scene: new THREE.Scene(),
+	camera: new THREE.OrthographicCamera( -100 * window.innerWidth/window.innerHeight , 100 * window.innerWidth/window.innerHeight , 100 , -100 , 0.1, 100 ),
 	sphere: new THREE.Mesh( 
 		new THREE.SphereBufferGeometry(1), 
 		new THREE.MeshBasicMaterial({ color: 0xff0040, wireframe: true }),
@@ -86,7 +98,24 @@ let Levels = [
 		interractiveItems: [],
 		lightHelpers: false,
 		events: [],
-		messages: {},
+		messages: {
+			instructions: {
+				text: `
+					Use [W][S][A][D] to move. </br>
+					Hold [Shift] to run or [C] to crouch. </br>
+					Press [Q] or [E] to look around. </br> 
+				`,
+				duration: 7000,
+			},
+			noLantern: {
+				text: `I feel like I'm forgetting something...`,
+				duration: 2000,
+			},
+			howToUseLantern: {
+				text: `Press [F] to switch on your glowstick`,
+				duration: 4000,
+			},
+		},
 	},
 	{
 		name: "Level 1",
@@ -96,7 +125,12 @@ let Levels = [
 		interractiveItems: [],
 		lightHelpers: true,
 		events: [],
-		messages: {},
+		messages: {
+			lockedDoor: {
+				text: `It's locked..`,
+				duration: 1000,
+			},
+		},
 	}
 ];
 
@@ -113,7 +147,7 @@ let init = function() {
 	scene0.background = new THREE.Color( 0x101020 );
 	scene1 = new THREE.Scene();
 	Levels[0].scene = scene0;
-	Levels[1].scene = scene0;
+	Levels[1].scene = scene1;
 
 	camera0 = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 1000 );
 	
@@ -146,6 +180,7 @@ let init = function() {
 		}, 1000 );
 		Levels[0].init();
 		
+		requestAnimationFrame( animate );
 	};
 	loadingManager.onProgress = function ( url, itemsLoaded, itemsTotal ) {
 		// console.log( 'Loading file: ' + url + '.\nLoaded ' + itemsLoaded + ' of ' + itemsTotal + ' files.' );
@@ -163,6 +198,7 @@ let init = function() {
 	audioLoader = new THREE.AudioLoader( loadingManager );
 	FBXLoader = new THREE.FBXLoader( loadingManager );
 	
+	fadeIn( waitingScreenDiv );
 	initTextures();
 	initSounds();
 	loadModels();
@@ -171,13 +207,13 @@ let init = function() {
 
 let loadingFinished = function(){
 	loadingReady = true;
+	fadeOut( waitingScreenDiv );
 }
 
 let LoadingScreen = function() {
 	ls.sphere.rotation.x += 0.004;
 	ls.sphere.rotation.y += 0.007;
 	
-	requestAnimationFrame(animate);
 	renderer.render( ls.scene, ls.camera );
 }
 
@@ -211,22 +247,18 @@ Levels[0].init = function( pos, rot ){
 				Levels[0].messages.instructions.text , 
 				Levels[0].messages.instructions.duration
 			);
-		}, 2000 )
+		}, 7000 )
 	}
 	
 	console.log( Levels[0].scene );
 }
 
 Levels[1].init = function( pos ){
+	// fadeIn( waitingScreenDiv );
+	
 	
 	currentLevel = 1;
 	
-	// audioListener.setMasterVolume( 0.0 );
-	/* for( let i in Sounds ){
-		if( Sounds[i] instanceof THREE.Audio || Sounds[i] instanceof THREE.PositionalAudio ){
-			Sounds[i].stop();
-		}
-	} */
 	Sounds.footsteps.setVolume( 0.0 );
 	clearScene( Levels[1] );
 	
@@ -243,7 +275,7 @@ Levels[1].init = function( pos ){
 	
 	if( GameState.progress === 1 ) Levels[1].initEvents();
 	
-	console.log( Levels[0].scene );
+	console.log( Levels[1].scene );
 }
 
 let loadModels = function(){
@@ -321,6 +353,8 @@ let initTextures = function(){
 	Textures.floor.lightMap = textureLoader.load( "assets/models/Level_0/floor_bake.png" );
 	Textures.floor.alphaMap = textureLoader.load( "assets/models/Level_0/negative_shadows.jpg" );
 	Textures.Creeper.skin = textureLoader.load( "assets/models/Creeper_final/skin.png" );
+	
+	Textures.loadingPics[0] = textureLoader.load( "assets/textures/dark-room-pic.jpg" );
 	
 }
 
@@ -411,8 +445,9 @@ let spam = function(num){
 let animate = function( time ) {
 	
 	if( loadingReady == false ){
-		LoadingScreen();
-		pointer.src = "assets/textures/pointer_empty.png";
+		// LoadingScreen();
+		// pointer.src = "assets/textures/pointer_empty.png";
+		requestAnimationFrame(animate);
 		return;
 	}
 	
@@ -427,11 +462,11 @@ let animate = function( time ) {
 		lEvent.trigger();
 	});
 	
-	renderer.render( scene0 , camera0 );
+	renderer.render( Levels[currentLevel].scene , camera0 );
 	requestAnimationFrame( animate );
 
 	stats.end();
 }
 
 init();
-requestAnimationFrame( animate );
+// requestAnimationFrame( animate );

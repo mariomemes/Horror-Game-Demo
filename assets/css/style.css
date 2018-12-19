@@ -1,0 +1,126 @@
+body {
+	background-color: #ffffff;
+	margin: 0;
+	overflow: hidden;
+}
+
+canvas{
+	z-index: 0;
+}
+
+.pointer{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	z-index: 1;
+	transform: translate( -50% , -50% );
+	pointer-events: none;
+	user-drag: none; 
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-drag: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+}
+.messager-container{
+	position: absolute;
+	visibility: hidden;
+	opacity: 0.0;
+	z-index: 2;
+	top: 20px;
+	left: 50%;
+	transform: translateX( -50% );
+	/* min-height: 100px;
+	height: 20vh; */
+	width: 70vw;
+	
+	padding: 20px 15px 15px;
+	
+	background: #000;
+	border-radius: 80px;
+	-webkit-box-shadow: 0px 0px 30px 25px rgba(0,0,0,1);
+	-moz-box-shadow: 0px 0px 30px 25px rgba(0,0,0,1);
+	box-shadow: 0px 0px 30px 25px rgba(0,0,0,1);
+	
+	font-size: 1.5rem;
+	color: #ccc;
+	text-align: center;
+	letter-spacing: 3px;
+	font-family: 'Charm', cursive;
+	
+	pointer-events: none;
+	user-select: none;
+}
+
+.waiting-screen{
+	position: absolute;
+	visibility: hidden;
+	opacity: 0.0;
+	
+	z-index: 10;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	max-width: -webkit-fill-available;
+	max-height: -webkit-fill-available;
+	background: #000;
+	padding: 5% 10%;
+	
+	color: #ccc;
+	font-size: 30px;
+	text-align: center;
+	font-family: 'Charm', cursive;
+	
+	pointer-events: none;
+	user-drag: none; 
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-drag: none;
+	-webkit-user-select: none;
+	-ms-user-select: none;
+}
+
+.img-container{
+	width: 60%;
+	height: 60%;
+	position: relative;
+	margin: auto;
+}
+
+.waiting-screen img{
+	display: block;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	border-radius: 20%;
+}
+
+.img-shadow{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	border-radius: 20%;
+	
+	-webkit-box-shadow: inset 0px 0px 50px 30px rgba(0,0,0,1);
+	-moz-box-shadow: inset 0px 0px 50px 30px rgba(0,0,0,1);
+	box-shadow: inset 0px 0px 50px 30px rgba(0,0,0,1);
+}
+
+.waiting-screen h3{
+	letter-spacing: 2px;
+}
+
+.fade-in{
+	opacity: 1.0;
+	visibility: visible;
+	transition: opacity 0.7s linear;
+}
+
+.fade-out{
+	opacity: 0.0;
+	visibility: hidden;
+	transition: visibility 0s 0.7s, opacity 0.7s linear;
+}
+
+

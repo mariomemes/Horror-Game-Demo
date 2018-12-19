@@ -199,7 +199,7 @@ Levels[0].turnOffLights = function(){
 	
 	let count = 0;
 	let lStartingIntensity = lights[0].intensity;
-	let length = 30; // in frames
+	let length = 20; // in frames
 	let turnOff = setInterval( function(){
 		
 		if( lights[0].intensity > 0 ){

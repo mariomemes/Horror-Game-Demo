@@ -2,68 +2,12 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<style>
-			body {
-				background-color: #ffffff;
-				margin: 0;
-				overflow: hidden;
-			}
-			.pointer{
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				z-index: 1;
-				transform: translate( -50% , -50% );
-				pointer-events: none;
-				user-drag: none; 
-				user-select: none;
-				-moz-user-select: none;
-				-webkit-user-drag: none;
-				-webkit-user-select: none;
-				-ms-user-select: none;
-			}
-			.messager-container{
-				position: absolute;
-				visibility: hidden;
-				opacity: 0.0;
-				z-index: 2;
-				top: 20px;
-				left: 50%;
-				transform: translateX( -50% );
-				/* min-height: 100px;
-				height: 20vh; */
-				width: 70vw;
-				
-				padding: 20px 15px 15px;
-				
-				background: #000;
-				border-radius: 80px;
-				-webkit-box-shadow: 0px 0px 30px 25px rgba(0,0,0,1);
-				-moz-box-shadow: 0px 0px 30px 25px rgba(0,0,0,1);
-				box-shadow: 0px 0px 30px 25px rgba(0,0,0,1);
-				
-				font-size: 2.0rem;
-				color: #ccc;
-				text-align: center;
-				letter-spacing: 3px;
-				
-				pointer-events: none;
-				user-select: none;
-			}
-			
-			.fade-in{
-				opacity: 0.8;
-				visibility: visible;
-				transition: opacity 0.7s linear;
-			}
-			
-			.fade-out{
-				opacity: 0.0;
-				visibility: hidden;
-				transition: visibility 0s 0.7s, opacity 0.7s linear;
-			}
-			
-		</style>
+		<title> Brynk </title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<link href="https://fonts.googleapis.com/css?family=Charm" rel="stylesheet">
+		
+		<link type="text/css" rel="stylesheet" href="assets/css/style.css" >
 	</head>
 	<body>
 		<canvas id="myCanvas"></canvas>
@@ -71,18 +15,26 @@
 		<img class="pointer" src="assets/textures/pointer.png">
 		
 		<div class="messager-container" >
-			Lorem ipsum liberate tuteme its treason then lies of the jedi tragedy of darth plaegious the wise
+			Messages
+		</div>
+		
+		<div class="waiting-screen" >
+			<div class="img-container">
+				<img src="assets/textures/dark-room-pic.jpg">
+				<div class="img-shadow" ></div>
+			</div>
+			<h3> Darkness, scary yet comforting </h3>
 		</div>
 		
 		<script src="assets/js/stats.min.js"></script>
 		<script src="assets/js/three.js"></script>
-		<script src="assets/js/DRACOLoader.js"></script>
-		<script src="assets/js/GLTFLoader.js"></script>
+		<script src="assets/js/loaders/DRACOLoader.js"></script>
+		<script src="assets/js/loaders/GLTFLoader.js"></script>
 		
-		<script src="assets/js/Inflate.min.js"></script>
-		<script src="assets/js/FBXLoader.js"></script>
+		<script src="assets/js/loaders/Inflate.min.js"></script>
+		<script src="assets/js/loaders/FBXLoader.js"></script>
 		
-		
+		<script src="assets/js/utilities/Messages.js" ></script>
 		<script src="assets/js/Main.js"></script>
 		<script src="assets/js/levels/Level_0.js"></script>
 		<script src="assets/js/levels/Level_1.js"></script>
@@ -90,6 +42,5 @@
 		<script src="assets/js/Classes.js"></script>
 		<script src="assets/js/enemies/Creeper.js" ></script>
 		
-		<script src="assets/js/Messages.js" ></script>
 	</body>
 </html>

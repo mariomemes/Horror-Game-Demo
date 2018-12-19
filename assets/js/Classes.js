@@ -12,6 +12,8 @@ let initPlayer = function( data ){
 	} else {
 		
 		// if( box3helpers ) Levels[ currentLevel ].scene.add( player.body, player.body.BBoxHelper )
+		Levels[currentLevel].scene.add( player.body );
+		
 		player.body.position.copy( data.position );
 		player.body.rotation.copy( data.rotation );
 		console.log("teleporto");
