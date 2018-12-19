@@ -251,6 +251,10 @@ Levels[0].init = function( pos, rot ){
 	}
 	
 	console.log( Levels[0].scene );
+	
+	setTimeout( function(){
+		fadeOut( waitingScreenDiv );
+	}, 4000 );
 }
 
 Levels[1].init = function( pos ){
@@ -276,6 +280,11 @@ Levels[1].init = function( pos ){
 	if( GameState.progress === 1 ) Levels[1].initEvents();
 	
 	console.log( Levels[1].scene );
+	
+	if( GameState.progress > 0 ) setTimeout( function(){
+		fadeOut( waitingScreenDiv );
+	}, 4000 );
+	
 }
 
 let loadModels = function(){

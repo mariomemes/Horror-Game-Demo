@@ -40,10 +40,15 @@ Levels[1].initModels = function(){
 			
 			node.clickEvent = function(){
 				
-				Levels[0].init( 
-					new THREE.Vector3( -10 , 5 , -4 ), 
-					new THREE.Euler( 0 , -90*Math.PI/180 , 0 ) 
-				);
+				fadeIn( waitingScreenDiv );
+				
+				setTimeout( function(){
+					Levels[0].init( 
+						new THREE.Vector3( -10 , 5 , -4 ), 
+						new THREE.Euler( 0 , -90*Math.PI/180 , 0 ) 
+					);
+				}, 300 );
+				
 			}
 			
 			Levels[1].interractiveItems.push( node );

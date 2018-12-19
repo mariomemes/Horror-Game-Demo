@@ -41,7 +41,13 @@ Levels[0].initModels = function(){
 			
 			node.clickEvent = function(){
 				if( GameState.progress >= 1 ){
-					Levels[1].init();
+					
+					fadeIn( waitingScreenDiv );
+				
+					setTimeout( function(){
+						Levels[1].init();
+					}, 300 );
+					
 				} else {
 					MessageSystem.showMessage( 
 						Levels[0].messages.noLantern.text, 
