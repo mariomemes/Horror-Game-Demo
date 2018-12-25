@@ -213,7 +213,8 @@ Levels[0].turnOffLights = function(){
 			
 			lights[0].intensity -= lStartingIntensity/length;
 			if( count === 30 - 29 ){
-				// play dying light sound
+				lights[0].add( Sounds.lightSlam );
+				Sounds.lightSlam.play();
 				console.log( "boom" );
 			}
 			
@@ -222,6 +223,9 @@ Levels[0].turnOffLights = function(){
 			lights[1].intensity -= lStartingIntensity/length;
 			if( count === 120 - 29 ){
 				// play dying light sound
+				lights[1].add( Sounds.lightSlam );
+				Sounds.lightSlam.stop();
+				Sounds.lightSlam.play();
 				console.log( "boom" );
 			}
 			

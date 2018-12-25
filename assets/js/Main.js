@@ -8,7 +8,7 @@ let loadingManager, textureLoader, gltfLoader, FBXLoader, audioLoader;
 let clock, delta;
 let currentLevel = 0;
 
-// Files
+// FILES
 let Textures = {
 	grass: null,
 	walls: {
@@ -31,9 +31,13 @@ let Textures = {
 	loadingPics: [],
 };
 let Sounds = {
-	footsteps: null,
-	doorOpening: null,
 	december: null,
+	doorOpeningLong: null,
+	doubleDoorSlam: null,
+	footsteps: null,
+	lightBulbBuzz: null,
+	lightSlam: null,
+	metalDoor: null,
 	quietGrowl: null,
 };
 
@@ -224,6 +228,7 @@ Levels[0].init = function( pos, rot ){
 	let startPosition, startRotation;
 	currentLevel = 0;
 	
+	Sounds.doorOpeningLong.play();
 	Sounds.footsteps.setVolume( 0.0 );
 	clearScene( Levels[0] );
 	
@@ -266,6 +271,7 @@ Levels[1].init = function( pos ){
 	
 	currentLevel = 1;
 	
+	Sounds.doorOpeningLong.play();
 	Sounds.footsteps.setVolume( 0.0 );
 	clearScene( Levels[1] );
 	
@@ -410,12 +416,52 @@ let initSounds = function(){
 		Sounds.quietGrowl.setLoop( false );
 		Sounds.quietGrowl.setVolume( 1.0 );
 		Sounds.quietGrowl.setRefDistance( 1.0 ); // distance from which the sound weakens
-		
-		Sounds.quietGrowl.setRolloffFactor( 0.1 );
+		Sounds.quietGrowl.setRolloffFactor( 0.1 ); // how much sound weakens per distance
 		Sounds.quietGrowl.setDistanceModel( "inverse" ); // default
 		// Sounds.december.setMaxDistance( 85 );
 		
-	})
+	});
+	
+	Sounds.doubleDoorSlam = new THREE.PositionalAudio( audioListener );
+	audioLoader.load( 'assets/sounds/double-door-slam.ogg', function( buffer ) {
+		Sounds.doubleDoorSlam.setBuffer( buffer );
+		Sounds.doubleDoorSlam.setLoop( false );
+		Sounds.doubleDoorSlam.setVolume( 1.0 );
+		Sounds.doubleDoorSlam.setRefDistance( 2.0 ); // distance from which the sound weakens
+		Sounds.doubleDoorSlam.setRolloffFactor( 0.2 );
+	});
+	
+	Sounds.lightBulbBuzz = new THREE.PositionalAudio( audioListener );
+	audioLoader.load( 'assets/sounds/lightbulb-buzz.ogg', function( buffer ) {
+		Sounds.lightBulbBuzz.setBuffer( buffer );
+		Sounds.lightBulbBuzz.setLoop( false );
+		Sounds.lightBulbBuzz.setVolume( 1.0 );
+		Sounds.lightBulbBuzz.setRefDistance( 10.0 ); // distance from which the sound weakens
+		Sounds.lightBulbBuzz.setRolloffFactor( 0.1 );
+	});
+	
+	Sounds.lightSlam = new THREE.PositionalAudio( audioListener );
+	audioLoader.load( 'assets/sounds/single-slam.ogg', function( buffer ) {
+		Sounds.lightSlam.setBuffer( buffer );
+		Sounds.lightSlam.setLoop( false );
+		Sounds.lightSlam.setVolume( 1.0 );
+		Sounds.lightSlam.setRefDistance( 0.1 ); // distance from which the sound weakens
+		Sounds.lightSlam.setRolloffFactor( 0.3 );
+	});
+	
+	Sounds.metalDoor = new THREE.Audio( audioListener );
+	audioLoader.load( 'assets/sounds/single-slam.ogg', function( buffer ) {
+		Sounds.metalDoor.setBuffer( buffer );
+		Sounds.metalDoor.setLoop( false );
+		Sounds.metalDoor.setVolume( 1.0 );
+	});
+	
+	Sounds.doorOpeningLong = new THREE.Audio( audioListener );
+	audioLoader.load( 'assets/sounds/door-opening-long.ogg', function( buffer ) {
+		Sounds.doorOpeningLong.setBuffer( buffer );
+		Sounds.doorOpeningLong.setLoop( false );
+		Sounds.doorOpeningLong.setVolume( 0.2 );
+	});
 }
 
 // Thanks to cdata/three-clone-gltf.js

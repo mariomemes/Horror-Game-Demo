@@ -107,6 +107,16 @@ class Creeper extends Enemy {
 		this.body.translateZ( this.runningSpeed * time );
 	}
 	
+	turn90deg( direction, duration ){
+		if( direction === "left" ){
+			
+			
+		} else if( direction === "right" ){
+			
+			
+		}
+	}
+	
 	initLevel1Scare(){
 		
 		this.animations.idle_stance.stop();
@@ -118,7 +128,7 @@ class Creeper extends Enemy {
 			this.mixer.update( time );
 			this.walk( time );
 			
-			if( this.body.position.x <= -80 ){
+			if( this.body.position.x <= -90 ){
 				Levels[currentLevel].scene.remove( this.body );
 				Monsters.array.splice( Monsters.array.indexOf( this ) , 1 );
 			}

@@ -226,7 +226,7 @@ Levels[1].initEvents = function(){
 					GameState.progress = 3;
 					
 					// Slamming on the door sounds
-					console.log( "slam slam!" );		
+					Sounds.doubleDoorSlam.play();
 				}
 			}
 		},
