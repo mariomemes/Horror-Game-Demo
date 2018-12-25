@@ -42,6 +42,7 @@ Levels[0].initModels = function(){
 			node.clickEvent = function(){
 				if( GameState.progress >= 1 ){
 					
+					player.ready = false;
 					fadeIn( waitingScreenDiv );
 				
 					setTimeout( function(){

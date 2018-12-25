@@ -41,12 +41,15 @@ Levels[1].initModels = function(){
 			node.clickEvent = function(){
 				
 				fadeIn( waitingScreenDiv );
+				player.ready = false;
 				
 				setTimeout( function(){
+						
 					Levels[0].init( 
 						new THREE.Vector3( -10 , 5 , -4 ), 
 						new THREE.Euler( 0 , -90*Math.PI/180 , 0 ) 
 					);
+					Levels[0].loading = false;
 				}, 300 );
 				
 			}
@@ -129,21 +132,53 @@ Levels[1].constructCollisionBoxes = function() {
 	
 }
 
-Levels[1].spawnMonster = function(){
+
+Levels[1].spawnMonsterOne = function(){
+	
+	// console.log( THREE.AnimationUtils.clone );
+	console.log( cloneGltf( Monsters.Creeper.gltf ) );
 	
 	Levels[1].Creeper = new Creeper({
-		body: Monsters.Creeper.body,
+		// body: Monsters.Creeper.body,
+		body: cloneGltf( Monsters.Creeper.gltf ).scene.children[0],
 		animationClips: Monsters.Creeper.animationClips,
-		// position: new THREE.Vector3( 10 , 0 , -5 ),
-		position: new THREE.Vector3( -60 , 0 , -152 ),
-		// position: new THREE.Vector3( 30 , 0 , 0 ),
-		scale: 0.7,
-		rotation: new THREE.Euler( 0 , -90 *Math.PI/180 , 0 ),
+		position: new THREE.Vector3( -60 , 0 , -152 ), // Main
+		rotation: new THREE.Euler( 0 , -90 *Math.PI/180 , 0 ), // Main
+		scale: 0.7, // Main
+		// position: new THREE.Vector3( 0 , 25 , 0 ),
+		// rotation: new THREE.Euler( 0 , 90 *Math.PI/180 , 180 *Math.PI/180 ),
+		// position: new THREE.Vector3( 10 , 0 , 3 ),
+		// rotation: new THREE.Euler( 0 , 90 *Math.PI/180 , 0 ),
+		// scale: 2.5,
 		walkingSpeed: Monsters.Creeper.walkingSpeed,
+		runningSpeed: Monsters.Creeper.runningSpeed,
 	});
 	
 	Levels[1].Creeper.body.children[1].material.color = new THREE.Color( 0.33, 0.25, 0.15 );
+	Levels[1].Creeper.body.children[1].material.map = Textures.Creeper.skin;
+	
+	Levels[1].Creeper.animations.idle_stance.play();
 	Levels[1].Creeper.body.add( Sounds.quietGrowl );
+}
+
+Levels[1].spawnBigMonster = function(){
+	
+	Levels[1].BigCreeper = new Creeper({
+		body: cloneGltf( Monsters.Creeper.gltf ).scene.children[0],
+		animationClips: Monsters.Creeper.animationClips,
+		position: new THREE.Vector3( -360 , 25 , 0 ),
+		// position: new THREE.Vector3( 0 , 25 , 0 ),
+		rotation: new THREE.Euler( 0 , 90 *Math.PI/180 , 180 *Math.PI/180 ),
+		scale: 2.5,
+		walkingSpeed: Monsters.Creeper.walkingSpeed,
+		runningSpeed: Monsters.Creeper.runningSpeed,
+	});
+	
+	Levels[1].BigCreeper.body.children[1].material.color = new THREE.Color( 0.5, 0.4, 0.3 );
+	Levels[1].BigCreeper.body.children[1].material.map = Textures.Creeper.skin;
+	
+	Levels[1].BigCreeper.animations.idle_4legs.play();
+	// Levels[1].BigCreeper.body.add( Sounds.quietGrowl );
 }
 
 Levels[1].initLights = function(){
@@ -162,7 +197,7 @@ Levels[1].initLights = function(){
 
 Levels[1].initEvents = function(){
 	
-	let FEevent = {
+	let firstMonsterEvent = {
 		name: "First Encounter",
 		trigger: function(){
 			if( GameState.progress === 1 ){
@@ -182,8 +217,48 @@ Levels[1].initEvents = function(){
 		},
 	};
 	
-	Levels[1].events.push( FEevent );
+	let doorSlammingEvent = {
+		name: "Slamming On The Door",
+		trigger: function(){
+			if( GameState.progress === 2 ){
+				
+				if( player.body.position.x <= -140 ){
+					GameState.progress = 3;
+					
+					// Slamming on the door sounds
+					console.log( "slam slam!" );		
+				}
+			}
+		},
+	};
+	
+	let lastMonsterChaseEvent = {
+		name: "Big Chase",
+		trigger: function(){
+			if( GameState.progress === 3 ){
+				
+				if( player.body.position.x <= -270 ){
+					GameState.progress = 4;
+					
+					// Start the monster chase
+					setTimeout( function(){
+						Levels[1].BigCreeper.initLevel1Chase();
+					}, 2000 );
+					
+					// Play sound
+					console.log( "Chase music" );
+				}
+			}
+		},
+	};
+	
+	Levels[1].events.push( 
+		firstMonsterEvent, 
+		doorSlammingEvent, 
+		lastMonsterChaseEvent 
+	);
 }
+
 
 
 

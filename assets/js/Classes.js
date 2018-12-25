@@ -79,7 +79,7 @@ class Player extends Entity {
 		
 		this.walkingSpeed = playerStats.speed;
 		this.sideWalkingSpeed = playerStats.speed * 0.7;
-		this.runningSpeed = 2.0; // 2.0
+		this.runningSpeed = 12.0; // 2.0
 		this.crouchingSpeed = 0.5;
 		this.turningSpeed = 300.0;
 		
@@ -465,6 +465,8 @@ class Player extends Entity {
 		let self = this;
 		window.addEventListener( 'keydown', function(evt){
 			
+			if( self.ready === false ) return;
+			
 			self.keyset( evt , true );
 			// console.log( evt );
 			
@@ -479,10 +481,16 @@ class Player extends Entity {
 		}, false );
 		
 		window.addEventListener( 'keyup', function(evt){
+			
+			if( self.ready === false ) return;
+			
 			self.keyset( evt , false, self );
 		}, false );
 		
 		canvas.addEventListener('mousemove', function(evt){
+			
+			if( self.ready === false ) return;
+			
 			let movementX = evt.movementX || evt.mozMovementX || evt.webkitMovementX || 0;
 			let movementY = evt.movementY || evt.mozMovementY || evt.webkitMovementY || 0;
 			
@@ -501,7 +509,7 @@ class Player extends Entity {
 		
 		canvas.addEventListener('mousedown', function(evt){
 			
-			if( !self.ready ) return;
+			if( self.ready === false ) return;
 			
 			evt.preventDefault();
 			if( evt.button === 0 ){ // LMB

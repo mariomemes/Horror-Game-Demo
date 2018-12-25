@@ -65,7 +65,7 @@ let ws = {
 // PLAYER
 let playerStats = {
 	height: 5,
-	speed: 7.0,
+	speed: 7.0, // 7.0 main
 }
 let player = {
 	update: function(){
@@ -80,12 +80,13 @@ let Monsters = {
 	// Info of enemies
 	Creeper: {
 		walkingSpeed: 4.0,
+		runningSpeed: 32.0,
 	},
 };
 
 // GAME
 let GameState = {
-	progress: 0,
+	progress: 1,
 };
 
 // LEVELS
@@ -96,8 +97,9 @@ let Levels = [
 		scene: null,
 		staticCollideMesh: [],
 		interractiveItems: [],
-		lightHelpers: false,
 		events: [],
+		lightHelpers: false,
+		loading: false,
 		messages: {
 			instructions: {
 				text: `
@@ -123,8 +125,9 @@ let Levels = [
 		scene: null,
 		staticCollideMesh: [],
 		interractiveItems: [],
-		lightHelpers: true,
 		events: [],
+		lightHelpers: true,
+		loading: false,
 		messages: {
 			lockedDoor: {
 				text: `It's locked..`,
@@ -178,7 +181,7 @@ let init = function() {
 		setTimeout( function(){ 
 			loadingFinished();
 		}, 1000 );
-		Levels[0].init();
+		Levels[1].init();
 		
 		requestAnimationFrame( animate );
 	};
@@ -268,7 +271,8 @@ Levels[1].init = function( pos ){
 	
 	Levels[1].initModels();
 	Levels[1].constructCollisionBoxes();
-	Levels[1].spawnMonster();
+	if( GameState.progress <= 1 ) Levels[1].spawnMonsterOne();
+	if( GameState.progress <= 3 ) Levels[1].spawnBigMonster();
 	Levels[1].initLights();
 	
 	initPlayer({
@@ -314,8 +318,8 @@ let loadModels = function(){
 		}
 	);
 	
-	// gltfLoader.load( '/assets/models/Creeper2/alien_v3.gltf',
-	gltfLoader.load( '/assets/models/Creeper_final/alien.gltf',
+	gltfLoader.load( '/assets/models/Creeper3/alien_v3.gltf',
+	// gltfLoader.load( '/assets/models/Creeper_final/alien.gltf',
 		function ( gltf ) {
 			
 			/* gltf.scene.children[0].traverse( function( node ){
@@ -333,9 +337,12 @@ let loadModels = function(){
 				}
 			} );
 			
-			gltf.scene.getObjectByName( "Creature" ).material.map = Textures.Creeper.skin;
+			gltf.scene.getObjectByName( "eye1" ).material.color = new THREE.Color( 0 , 0 , 0 );
+			gltf.scene.getObjectByName( "eye1" ).material.metalness = 0.7;
+			gltf.scene.getObjectByName( "eye1" ).material.roughness = 0.3;
 			
 			Monsters.Creeper.body = gltf.scene.children[0];
+			Monsters.Creeper.gltf = gltf;
 			Monsters.Creeper.animationClips = gltf.animations;
 			
 		}, function ( xhr ) {
@@ -411,8 +418,57 @@ let initSounds = function(){
 	})
 }
 
+// Thanks to cdata/three-clone-gltf.js
+// https://gist.github.com/cdata/f2d7a6ccdec071839bc1954c32595e87
+const cloneGltf = (gltf) => {
+  const clone = {
+    animations: gltf.animations,
+    scene: gltf.scene.clone(true)
+  };
+
+  const skinnedMeshes = {};
+
+  gltf.scene.traverse(node => {
+    if (node.isSkinnedMesh) {
+      skinnedMeshes[node.name] = node;
+    }
+  });
+
+  const cloneBones = {};
+  const cloneSkinnedMeshes = {};
+
+  clone.scene.traverse(node => {
+    if (node.isBone) {
+      cloneBones[node.name] = node;
+    }
+
+    if (node.isSkinnedMesh) {
+      cloneSkinnedMeshes[node.name] = node;
+    }
+  });
+
+  for (let name in skinnedMeshes) {
+    const skinnedMesh = skinnedMeshes[name];
+    const skeleton = skinnedMesh.skeleton;
+    const cloneSkinnedMesh = cloneSkinnedMeshes[name];
+
+    const orderedCloneBones = [];
+
+    for (let i = 0; i < skeleton.bones.length; ++i) {
+      const cloneBone = cloneBones[skeleton.bones[i].name];
+      orderedCloneBones.push(cloneBone);
+    }
+
+    cloneSkinnedMesh.bind(
+        new THREE.Skeleton(orderedCloneBones, skeleton.boneInverses),
+        cloneSkinnedMesh.matrixWorld);
+  }
+
+  return clone;
+}
+
 let clearScene = function( level ){
-	player.ready = false;
+	// player.ready = false;
 	
 	// Clear all scene objects
 	let Scene = level.scene;
