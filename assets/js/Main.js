@@ -3,7 +3,7 @@ let pointer = document.querySelector(".pointer");
 let messager = document.querySelector(".messager-container");
 let waitingScreenDiv = document.querySelector(".waiting-screen");
 
-let camera0, scene0, scene1, renderer, stats, controls, audioListener;
+let camera0, scene0, scene1, renderer, stats, controls, audioListener, maxAnisotropy;
 let loadingManager, textureLoader, gltfLoader, FBXLoader, audioLoader;
 let clock, delta;
 let currentLevel = 0;
@@ -90,7 +90,7 @@ let Monsters = {
 
 // GAME
 let GameState = {
-	progress: 1,
+	progress: 0,
 };
 
 // LEVELS
@@ -102,7 +102,7 @@ let Levels = [
 		staticCollideMesh: [],
 		interractiveItems: [],
 		events: [],
-		lightHelpers: false,
+		lightHelpers: true,
 		loading: false,
 		messages: {
 			instructions: {
@@ -149,6 +149,7 @@ let init = function() {
 		renderer.shadowMap.enabled = true;
 		renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	}
+	maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
 
 	scene0 = new THREE.Scene();
 	scene0.background = new THREE.Color( 0x101020 );
@@ -185,7 +186,7 @@ let init = function() {
 		setTimeout( function(){ 
 			loadingFinished();
 		}, 1000 );
-		Levels[1].init();
+		Levels[0].init();
 		
 		requestAnimationFrame( animate );
 	};
@@ -299,8 +300,8 @@ Levels[1].init = function( pos ){
 
 let loadModels = function(){
 
-	// gltfLoader.load( '/assets/models/Level_0_alt/glb/room1_ver2.glb',
-	gltfLoader.load( '/assets/models/Level_0/room1_ver2.gltf',
+	gltfLoader.load( '/assets/models/Level_0_alt/room2.gltf',
+	// gltfLoader.load( '/assets/models/Level_0/room1_ver2.gltf',
 		function ( gltf ) {
 			
 			Levels[0].gltf = gltf;
@@ -372,8 +373,8 @@ let initTextures = function(){
 	Textures.walls.roughnessMap = textureLoader.load( "assets/models/Level_1/redbricks2b-rough.png" );
 	Textures.walls.metalnessMap = textureLoader.load( "assets/models/Level_1/redbricks2b-metalness.png" );
 	
-	Textures.floor.lightMap = textureLoader.load( "assets/models/Level_0/floor_bake.png" );
-	Textures.floor.alphaMap = textureLoader.load( "assets/models/Level_0/negative_shadows.jpg" );
+	Textures.floor.lightMap = textureLoader.load( "assets/models/Level_0_alt/floor_bake.png" );
+	Textures.floor.alphaMap = textureLoader.load( "assets/models/Level_0_alt/negative_shadows.jpg" );
 	Textures.Creeper.skin = textureLoader.load( "assets/models/Creeper_final/skin.png" );
 	
 	Textures.loadingPics[0] = textureLoader.load( "assets/textures/dark-room-pic.jpg" );

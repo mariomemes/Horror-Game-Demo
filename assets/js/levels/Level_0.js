@@ -13,13 +13,11 @@ Levels[0].createStartingMesh = function(){
 }
 
 Levels[0].initModels = function(){
-	
-	// Levels[0].gltf.scene.position.y += 0.01; // avoid Z fighting
 
 	Levels[0].gltf.scene.traverse( function( node ) {
 		
 		if( node.name.includes( "Lamp" ) ) {
-			let light = new THREE.PointLight( 0xffffee, 1.0, 15 , 2 ); // 1.5
+			let light = new THREE.PointLight( 0xffffee, 2.0, 15 , 2 ); // 1.5
 			light.position.copy( node.position );
 			// light.position.y += 1;
 			if(shadows){
@@ -63,14 +61,6 @@ Levels[0].initModels = function(){
 
 		}
 
-		if( node.name.includes( "Box" ) ){
-			// "http://localhost:8080/models/room1/wood.png"
-			// Bad texture naming led to a bug
-			let baseUri = node.material.map.image.baseURI;
-			node.material.map.image.currentSrc = baseUri + 'assets/models/Level_0/box_wood.jpg';
-			node.material.map.image.src = baseUri + 'assets/models/Level_0/box_wood.jpg';
-		}
-
 		if( ( node.name.includes( "Box" ) ||
 			node.name.includes( "Barrel" ) ||
 			node.name.includes( "Wall" ) ||
@@ -91,16 +81,10 @@ Levels[0].initModels = function(){
 			node.receiveShadow = true;
 		}
 		
-		if( node instanceof THREE.Mesh ){
-			// console.log( " m: " + node.material.metalness + " r: " + node.material.roughness  );
-			node.material.metalness = 0;
-			node.material.roughness = 1;
+		if( node.name.includes( "Room" ) || node.name.includes( "Floor" ) || node.name.includes( "Wall" ) ){
+			if( node.material.map ) node.material.map.anisotropy = maxAnisotropy;
 		}
-		
-		if( node.name.includes( "Room" ) || node.name.includes( "Floor" ) ){
-			node.material.metalnessMap = Textures.walls.metalnessMap;
-			node.material.roughnessMap = Textures.walls.roughnessMap;
-		}
+			
 
 		if( node.name === "Floor" ){
 			
