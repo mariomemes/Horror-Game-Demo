@@ -438,7 +438,7 @@ class Player extends Entity {
 			} else {
 				clearInterval( pullUp );
 			}
-		}, 1000/60 );
+		}, 1000/30 );
 	}
 	
 	walkingSound(){

@@ -17,16 +17,17 @@ Levels[0].initModels = function(){
 	Levels[0].gltf.scene.traverse( function( node ) {
 		
 		if( node.name.includes( "Lamp" ) ) {
-			let light = new THREE.PointLight( 0xffffee, 2.0, 15 , 2 ); // 1.5
+			// let light = new THREE.PointLight( 0xffffee, 2.0, 15 , 2 );
+			let light = new THREE.PointLight( 0xffffee, 1.5, 17 , 2 );
 			light.position.copy( node.position );
 			// light.position.y += 1;
 			if(shadows){
 				light.castShadow = true;
-				light.shadow.mapSize.width = 512*1;
-				light.shadow.mapSize.height = 512*1;
+				light.shadow.mapSize.width = 512*2;
+				light.shadow.mapSize.height = 512*2;
 				light.shadow.camera.near = 0.1;
 				light.shadow.camera.far = 1000;
-				light.shadow.bias = 0.0001;
+				// light.shadow.bias = 0.0001;
 			}
 			
 			Levels[0].Lights.push( light );
@@ -88,7 +89,8 @@ Levels[0].initModels = function(){
 
 		if( node.name === "Floor" ){
 			
-			if( node.children.length === 0 ){
+			// Shadow Plane
+			/* if( node.children.length === 0 ){
 				node.geometry.computeBoundingBox();
 				let size = new THREE.Vector3();
 				node.geometry.boundingBox.getSize( size );
@@ -103,7 +105,7 @@ Levels[0].initModels = function(){
 				shadowPlane.position.y += 0.01;
 				shadowPlane.rotation.x = -90 * Math.PI/180;
 				node.add( shadowPlane );
-			}
+			} */
 		}
 
 	});
@@ -199,7 +201,6 @@ Levels[0].turnOffLights = function(){
 			if( count === 30 - 29 ){
 				lights[0].add( Sounds.lightSlam );
 				Sounds.lightSlam.play();
-				console.log( "boom" );
 			}
 			
 		} else if( lights[1].intensity > 0 && count > 90 ){
@@ -210,13 +211,13 @@ Levels[0].turnOffLights = function(){
 				lights[1].add( Sounds.lightSlam );
 				Sounds.lightSlam.stop();
 				Sounds.lightSlam.play();
-				console.log( "boom" );
 			}
 			
 		} else if( lights[1].intensity <= 0 ){
 			
 			lights[0].intensity = 0;
 			lights[1].intensity = 0;
+			lights[2].intensity = 0;
 			MessageSystem.showMessage( 
 				Levels[0].messages.howToUseLantern.text, 
 				Levels[0].messages.howToUseLantern.duration
@@ -231,10 +232,13 @@ Levels[0].turnOffLights = function(){
 }
 
 Levels[0].initLights = function(){
-	let ambientLight = new THREE.AmbientLight( 0xffffff , 0.02 );
+	let ambientLight = new THREE.AmbientLight( 0xffffff , 0.03 ); // 0.02
 	Levels[0].Lights.push( ambientLight );
 	
 	if( GameState.progress === 0 ){
+		let extraLight = new THREE.PointLight( 0xffffee , 0.2 , 30 , 2 );
+		extraLight.position.set( 2 , 2 , -8 );
+		Levels[0].Lights.push( extraLight );
 		
 		Levels[0].Lights.forEach( function( light ){
 			Levels[0].scene.add( light );

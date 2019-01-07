@@ -42,7 +42,7 @@ let Sounds = {
 };
 
 
-let shadows = false;
+let shadows = true;
 let box3helpers = false;
 
 // LOADING SCREEN
@@ -187,6 +187,8 @@ let init = function() {
 			loadingFinished();
 		}, 1000 );
 		Levels[0].init();
+		renderer.shadowMap.autoUpdate = false;
+		renderer.shadowMap.needsUpdate = true;
 		
 		requestAnimationFrame( animate );
 	};
