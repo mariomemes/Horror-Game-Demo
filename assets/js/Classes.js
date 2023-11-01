@@ -100,7 +100,7 @@ class Player extends Entity {
 		this.lanternON = false;
 		this.lanternCD = 0;
 		this.lanternCDmax = 30;
-		this.lanternMaxIntensity = 5;
+		this.lanternMaxIntensity = 10;
 		this.buildLantern();
 		if( GameState.progress >= 1 ) this.activateLantern();
 		
@@ -340,39 +340,45 @@ class Player extends Entity {
 	
 	switchLight(){
 		let self = this;
-		
-		let lanternAnimation = function( ON, miliseconds ){
+		this.lanternON = false;
+this.lanternCD = 0;
+this.lanternCDmax = 30;
+this.lanternMaxIntensity = 10; // increased to a higher value
+this.buildLantern();
+if( GameState.progress >= 1 ) this.activateLantern(); // make sure the lantern is activated if the progress is already at 1
+
+let lanternAnimation = function( ON, miliseconds ){
 			
-			if( ON == true ){ // switch off
-				
-				setTimeout( function(){
-					if( self.lanternLight.intensity <= 0 ){
-						self.lantern.material.emissive.g = 0;
-						self.lanternLight.intensity = 0;
-						return; // color is 0, job is done
-					} else {
-						self.lantern.material.emissive.g -= 0.5/miliseconds;
-						self.lanternLight.intensity -= self.lanternMaxIntensity / miliseconds;
-						
-						return lanternAnimation( true, miliseconds )
-					}
-				}, 1000/60);
-				
-			} else { // switch on
-				
-				setTimeout( function(){
-					if( self.lanternLight.intensity >= self.lanternMaxIntensity ){
-						return;	
-					} else {
-						self.lantern.material.emissive.g += 0.5/miliseconds;
-						self.lanternLight.intensity += self.lanternMaxIntensity / miliseconds;
-						
-						return lanternAnimation( false, miliseconds )
-					}
-				}, 1000/60);
-				
+	if( ON == true ){ // switch off
+
+		setTimeout( function(){
+			if( self.lanternLight.intensity <= 0 ){
+				self.lantern.material.emissive.g = 0;
+				self.lanternLight.intensity = 0;
+				return; // color is 0, job is done
+			} else {
+				self.lantern.material.emissive.g -= 0.5/miliseconds;
+				self.lanternLight.intensity -= self.lanternMaxIntensity / miliseconds; // use the updated max intensity value
+
+				return lanternAnimation( true, miliseconds )
 			}
-		};
+		}, 1000/60);
+
+	} else { // switch on
+
+		setTimeout( function(){
+			if( self.lanternLight.intensity >= self.lanternMaxIntensity ){ // use the updated max intensity value
+				return;	
+			} else {
+				self.lantern.material.emissive.g += 0.5/miliseconds;
+				self.lanternLight.intensity += self.lanternMaxIntensity / miliseconds; // use the updated max intensity value
+
+				return lanternAnimation( false, miliseconds )
+			}
+		}, 1000/60);
+
+	}
+};
 		
 		if( this.lanternCD === 0 ){
 			if( this.lanternON ){ // switch off
