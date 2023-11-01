@@ -100,7 +100,7 @@ class Player extends Entity {
 		this.lanternON = false;
 		this.lanternCD = 0;
 		this.lanternCDmax = 30;
-		this.lanternMaxIntensity = 1.2;
+		this.lanternMaxIntensity = 5;
 		this.buildLantern();
 		if( GameState.progress >= 1 ) this.activateLantern();
 		
